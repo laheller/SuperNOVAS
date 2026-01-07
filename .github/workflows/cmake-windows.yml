@@ -45,5 +45,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: SuperNOVAS shared library (.dll)
-        path: ${{github.workspace}}/${{env.BUILD_DIR}}/bin/${{env.BUILD_TYPE}}/supernovasd.dll
+        path: ${{github.workspace}}/${{env.BUILD_DIR}}/bin/${{env.BUILD_TYPE}}/supernovasd.*
         retention-days: 5
