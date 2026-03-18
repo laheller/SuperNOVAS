@@ -21,10 +21,10 @@ endif
 coverage:
 	$(MAKE) cov
 
-cov: cov.info
+cov: lcov.info
 	genhtml $< -o $@
 
-cov.info:
+lcov.info:
 	geninfo . -o $@
 	lcov --remove $@ $(EXCLUDE_COV) -o $@
 
@@ -57,7 +57,7 @@ clean: clean-test clean-cov
 distclean: clean clean-data
 	$(MAKE) -s -C c99 distclean
 	$(MAKE) -s -C cpp distclean
-	rm -f cov.info
+	rm -f lcov.info
 	rm -rf cov
 
 
