@@ -55,4 +55,7 @@ jobs:
         run: make distro
 
       - name: Install to local prefix
-        run: make DESTDIR=$HOME/.local install
+        run: |
+          mkdir $HOME/test
+          make DESTDIR=$HOME/test install
+
