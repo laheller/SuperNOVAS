@@ -99,6 +99,7 @@ int ecl2equ(double jd_tt, enum novas_equator_type coord_sys, enum novas_accuracy
  *
  * REFERENCES:
  * <ol>
+ * <li>J.-C. Liu, Z. Zhu, and H. Zhang, A&amp;A, 526, A16 (2011), Eq. 18</li>
  * <li>Hipparcos and Tycho Catalogues, Vol. 1, Section 1.5.3.</li>
  * </ol>
  *
@@ -119,12 +120,12 @@ int ecl2equ(double jd_tt, enum novas_equator_type coord_sys, enum novas_accuracy
 int gal2equ(double glon, double glat, double *restrict ra, double *restrict dec) {
   double pos1[3], pos2[3], xyproj, coslat;
 
-  // Rotation matrix A_g from Hipparcos documentation eq. 1.5.11.
+  // Rotation matrix A_g from Liu+2011 Eq. 18
   // AK: Transposed compared to NOVAS C 3.1 for dot product handling.
   static const double ag[3][3] = { //
-          { -0.0548755604, +0.4941094279, -0.8676661490 }, //
-          { -0.8734370902, -0.4448296300, -0.1980763734 }, //
-          { -0.4838350155, +0.7469822445, +0.4559837762 } };
+          { -0.054875657707, +0.494109437203, -0.867666137554 }, //
+          { -0.873437051953, -0.444829721222, -0.198076337284 }, //
+          { -0.483835073621, +0.746982183981, +0.455983813693 } };
 
   if(!ra || !dec)
     return novas_error(-1, EINVAL, "gal2equ", "NULL output pointer: ra=%p, dec=%p", ra, dec);
@@ -302,6 +303,7 @@ int hor_to_itrs(const on_surface *restrict location, double az, double za, doubl
  *
  * REFERENCES:
  * <ol>
+ * <li>J.-C. Liu, Z. Zhu, and H. Zhang, A&amp;A, 526, A16 (2011), Eq. 18</li>
  * <li>Hipparcos and Tycho Catalogues, Vol. 1, Section 1.5.3.</li>
  * </ol>
  *
@@ -318,12 +320,12 @@ int hor_to_itrs(const on_surface *restrict location, double az, double za, doubl
 int equ2gal(double ra, double dec, double *restrict glon, double *restrict glat) {
   double pos1[3], pos2[3], xyproj, cosd;
 
-  // Rotation matrix A_g from Hipparcos documentation eq. 1.5.11.
+  // Rotation matrix A_g from Liu+2011 (Eq. 18)
   // AK: Transposed compared to NOVAS C 3.1 for dot product handling.
   static const double ag[3][3] = { //
-          { -0.0548755604, -0.8734370902, -0.4838350155 }, //
-          { +0.4941094279, -0.4448296300, +0.7469822445 }, //
-          { -0.8676661490, -0.1980763734, +0.4559837762 } };
+          { -0.054875657707, -0.873437051953, -0.483835073621 }, //
+          { +0.494109437203, -0.444829721222, +0.746982183981 }, //
+          { -0.867666137554, -0.198076337284, +0.455983813693 } };
 
   if(!glon || !glat)
     return novas_error(-1, EINVAL, "equ2gal", "NULL output pointer: glon=%p, glat=%p", glon, glat);
@@ -920,6 +922,86 @@ int novas_uvw_to_xyz(const double *uvw, double ha, double dec, double *xyz) {
   prop_error("novas_uvw_to_xyz", novas_los_to_xyz(uvw, -15.0 * ha, dec, xyz), 0);
   return 0;
 }
+
+/**
+ * Converts an ITRF position vector to a local East-North-Up (ENU) vector at the
+ * specified site.
+ *
+ * @param itrf        _xyz_ position vector in ITRF.
+ * @param lon         [deg] ITRF longitude of site.
+ * @param lat         [deg] ITRF latitude of site.
+ * @param[out] enu    output East-North-Up (ENU) vector. It may be the same vector as the input.
+ * @return            0 if successful, or else -1 if either pointer argument is NULL (errno will be
+ *                    set to EINVAL).
+ *
+ * @sa novas_enu_to_itrf()
+ */
+int novas_itrs_to_enu(const double *itrf, double lon, double lat, double *enu) {
+  static const char *fn = "novas_itrs_to_enu";
+
+  double x, y, z;
+  double slon, clon, slat, clat;
+
+  if(!itrf)
+    return novas_error(-1, EINVAL, fn, "input ITRF vector is NULL");
+  if(!enu)
+    return novas_error(-1, EINVAL, fn, "output ENU vector is NULL");
+
+  x = itrf[0];
+  y = itrf[1];
+  z = itrf[2];
+
+  slon = sin(lon * DEGREE);
+  clon = cos(lon * DEGREE);
+  slat = sin(lat * DEGREE);
+  clat = cos(lat * DEGREE);
+
+  enu[0] = -slon * x + clon * y;
+  enu[1] = -slat * (clon * x + slon * y) + clat * z;
+  enu[2] =  clat * (clon * x + slon * y) + slat * z;
+
+  return 0;
+}
+
+/**
+ * Converts an  East-North-Up (ENU) vector at the specified site to an ITRF vector.
+ *
+ * @param enu         input East-North-Up (ENU) vector.
+ * @param lon         [deg] ITRF longitude of site.
+ * @param lat         [deg] ITRF latitude of site.
+ * @param[out] itrf   output ITRF vector. It may be the same vector as the input.
+ * @return            0 if successful, or else -1 if either pointer argument is NULL (errno will be
+ *                    set to EINVAL).
+ *
+ * @sa novas_itrf_to_enu()
+ */
+int novas_enu_to_itrs(const double *enu, double lon, double lat, double *itrf) {
+  static const char *fn = "novas_itrs_to_enu";
+
+  double E, N, U;
+  double slon, clon, slat, clat;
+
+  if(!enu)
+    return novas_error(-1, EINVAL, fn, "input ENU vector is NULL");
+  if(!itrf)
+    return novas_error(-1, EINVAL, fn, "output ITRF vector is NULL");
+
+  E = enu[0];
+  N = enu[1];
+  U = enu[2];
+
+  slon = sin(lon * DEGREE);
+  clon = cos(lon * DEGREE);
+  slat = sin(lat * DEGREE);
+  clat = cos(lat * DEGREE);
+
+  itrf[0] = -slon * E - clon * (slat * N - clat * U);
+  itrf[1] =  clon * E - slon * (slat * N - clat * U);
+  itrf[2] =  clat * N + slat * U;
+
+  return 0;
+}
+
 
 /**
  * Returns the Parallactic Angle (PA) calculated for a horizontal Az/El location of the

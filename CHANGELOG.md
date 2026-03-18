@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the [SuperNOVAS](https://github.com/Smithsonian/SuperNOVAS) library will be documented in this 
+All notable changes to the [SuperNOVAS](https://github.com/Sigmyne/SuperNOVAS) library will be documented in this 
 file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to 
@@ -15,8 +15,13 @@ Upcoming feature release.
 
 ### Added
 
+ - Added `novas_enu_to_itrs()` and `novas_itrs_to_enu()` functions to help convert between local East-North-Up (ENU)
+   coordinates and ITRS. ENU is a natural local cartesian coordinate system of an observer at or near the Earth's 
+   surface.
 
 ### Changed
+
+ - Use more precise matrix from Liu et al. (2011) for equatorial / galactic conversions. 
 
 
 ## [1.5.1] - 2026-01-02

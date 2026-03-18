@@ -4031,8 +4031,11 @@ static int test_approx_heliocentric() {
 
 
   // Check that both Pluto and its barycenter process
-  if(!is_ok("approx_heliocentric:neptune:2050", novas_approx_heliocentric(NOVAS_PLUTO, 2469936.0, pos, vel))) n++;
-  if(!is_ok("approx_heliocentric:neptune:2050", novas_approx_heliocentric(NOVAS_PLUTO_BARYCENTER, 2469936.0, pos0, vel0))) n++;
+  if(!is_ok("approx_heliocentric:pluto:2050", novas_approx_heliocentric(NOVAS_PLUTO, 2469936.0, pos, vel))) n++;
+  if(!is_ok("approx_heliocentric:pluto_bary:2050", novas_approx_heliocentric(NOVAS_PLUTO_BARYCENTER, 2469936.0, pos0, vel0))) n++;
+
+  if(!is_ok("approx_heliocentric:pluto/bary:2050:pos", check_equal_pos(pos, pos0, 2e-2))) n++;
+  if(!is_ok("approx_heliocentric:pluto/bary:2050:vel", check_equal_pos(vel, vel0, 1e-2))) n++;
 
   return n;
 }
@@ -4887,6 +4890,36 @@ static int test_Rz() {
   return n;
 }
 
+static int test_enu_itrs() {
+  int n = 0;
+
+  double E = 1.0, N = 2.0, U = 3.0;
+  double enu[3] = {E, N, U}, itrs[3] = {0.0}, enu1[3] = {0.0};
+
+  if(!is_ok("enu_to_itrs", novas_enu_to_itrs(enu, 0.0, 0.0, itrs))) n++;
+  if(!is_equal("enu_to_itrs:(0,0):x", itrs[0], U, 1e-14)) n++;
+  if(!is_equal("enu_to_itrs:(0,0):y", itrs[1], E, 1e-14)) n++;
+  if(!is_equal("enu_to_itrs:(0,0):z", itrs[2], N, 1e-14)) n++;
+  if(!is_ok("enu_to_itrs", novas_itrs_to_enu(itrs, 0.0, 0.0, enu1))) n++;
+  if(!is_ok("itrs_to_enu:(0,0)", check_equal_pos(enu1, enu, 1e-14))) n++;
+
+  if(!is_ok("enu_to_itrs", novas_enu_to_itrs(enu, 90.0, 0.0, itrs))) n++;
+  if(!is_equal("enu_to_itrs:(90,0):x", itrs[0], -E, 1e-14)) n++;
+  if(!is_equal("enu_to_itrs:(90,0):y", itrs[1], U, 1e-14)) n++;
+  if(!is_equal("enu_to_itrs:(90,0):z", itrs[2], N, 1e-14)) n++;
+  if(!is_ok("enu_to_itrs:2", novas_itrs_to_enu(itrs, 90.0, 0.0, enu1))) n++;
+  if(!is_ok("itrs_to_enu:(90,0)", check_equal_pos(enu1, enu, 1e-14))) n++;
+
+  if(!is_ok("enu_to_itrs", novas_enu_to_itrs(enu, 0.0, 30.0, itrs))) n++;
+  if(!is_equal("enu_to_itrs:(0,30):x", -itrs[0], N * sin(30.0 * DEGREE) - U * cos(30.0 * DEGREE), 1e-14)) n++;
+  if(!is_equal("enu_to_itrs:(0,30):y", itrs[1], E, 1e-14)) n++;
+  if(!is_equal("enu_to_itrs:(0,30):z", itrs[2], N * cos(30.0 * DEGREE) + U * sin(30.0 * DEGREE), 1e-14)) n++;
+  if(!is_ok("enu_to_itrs:3", novas_itrs_to_enu(itrs, 0.0, 30.0, enu1))) n++;
+  if(!is_ok("itrs_to_enu:(0,30)", check_equal_pos(enu1, enu, 1e-14))) n++;
+
+  return n;
+}
+
 int main(int argc, char *argv[]) {
   int n = 0;
 
@@ -5043,6 +5076,8 @@ int main(int argc, char *argv[]) {
   if(test_Rx()) n++;
   if(test_Ry()) n++;
   if(test_Rz()) n++;
+
+  if(test_enu_itrs()) n++;
 
   n += test_dates();
 
