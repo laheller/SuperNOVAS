@@ -301,6 +301,29 @@ Horizontal Apparent::to_horizontal() const {
 }
 
 /**
+ * Returns the projected 3D position, relative to the SSB or other Solar-System place, which gave
+ * rise to these apparent place on sky. The position is antedated to the time the observed light
+ * originated from the observed body,
+ *
+ * @return        The position referenced to the given Solar-system body or place, and antedated
+ *                for light travel time for this apparent position.
+ */
+ReferencedPosition Apparent::geometric_position() const {
+  const novas_frame *f = _frame._novas_frame();
+
+  Time t = _frame.time() - (_pos.dis * Unit::AU / Constant::c);
+  Position ref = Position(f->obs_pos, Unit::au);
+
+  double p[3] = {0.0};
+  if(novas_app_to_geom(_frame._novas_frame(), NOVAS_TOD, _pos.ra, _pos.dec, _pos.dis, p) != 0) {
+    novas_trace_invalid("Apparent::geometric_position()");
+    return ReferencedPosition(Position::undefined(), t, ref);
+  }
+
+  return ReferencedPosition(Position(p, Unit::au), t, ref);
+}
+
+/**
  * Returns a human-readable basic string description of these apparent positions.
  *
  * @param decimals    (optional) Number of decimal places to print after the decimal point (default: 3).

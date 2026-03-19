@@ -151,6 +151,23 @@ const Position& Position::origin() {
 }
 
 /**
+ * Returns a referenced position from this position, for the specified time and Solary-system barycentric
+ * position (and optionally a barycentric velocity)
+ *
+ * @param time      Astrometric time at which this position is defined.
+ * @param ssb_pos   (optional) Solar-system barycentric position vector of the place relative to
+ *                  which this position is defined (default: SSB).
+ *                  needed (default: stationary).
+ * @return
+ */
+ReferencedPosition Position::referenced_to(const Time& time, const Position& ssb_pos) const {
+  ReferencedPosition p = ReferencedPosition(*this, time, ssb_pos);
+  if(!p.is_valid())
+    novas_trace_invalid("Position::referenced_to()");
+  return p;
+}
+
+/**
  * Returns a string represetation of this position vector, optionally setting the number of
  * decimal places to show for each component.
  *

@@ -13,7 +13,7 @@ TESTS = AngleTest TimeAngleTest IntervalTest CoordinateTest ScalarVelocityTest T
     PressureTest EOPTest SphericalTest CalendarTest PositionTest GalacticTest EclipticTest \
     WeatherTest VelocityTest EquinoxTest VectorTest CatalogEntryTest OrbitalTest EquatorialTest \
 	TemperatureTest SiteTest ObserverTest TimeTest FrameTest SourceTest PlanetTest HorizontalTest \
-	ApparentTest GeometricTest TrackTest
+	ApparentTest GeometricTest TrackTest ReferencedPositionTest
 
 .PHONY: build
 build: libnovas.a $(TESTS)

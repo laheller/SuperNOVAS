@@ -57,6 +57,13 @@ int main() {
   if(!test.check("horizontal(gc)", !tod.to_horizontal().is_valid())) n++;
   if(!test.equals("to_string()", tod.to_string(), "Apparent EQU 03h 00m 00.0000s   -15d 00m 00.000s  TOD J2000 in Frame for Geocentric Observer at 2000-01-01T11:58:55.816 UTC")) n++;
 
+  double v[3] = {0.0};
+  novas_app_to_geom(frame._novas_frame(), NOVAS_TOD, p.ra, p.dec, p.dis, v);
+  ReferencedPosition rp = tod.geometric_position();
+  if(!test.check("geometric_position()", rp.is_valid())) n++;
+  if(!test.check("geometric_position() ==", rp == Position(v, Unit::AU))) n++;
+  if(!test.check("geometric_position(frame invalid)", !x.geometric_position().is_valid())) n++;
+
   double ra_cirs = app_to_cirs_ra(frame.time().jd(), NOVAS_REDUCED_ACCURACY, p.ra);
   if(!test.check("cirs()", tod.cirs() == Equatorial(ra_cirs * Unit::hour_angle, p.dec * Unit::deg, Equinox::cirs(Time::j2000())))) n++;
 

@@ -35,6 +35,7 @@ class Constant;
 class Validating;
 class Vector;
 class   Position;
+class     ReferencedPosition;
 class   Velocity;
 class Equinox;
 class Coordinate;
@@ -624,45 +625,6 @@ public:
 
 Vector operator*(double factor, const Vector& v);
 
-/**
- * A 3D physical position vector in space.
- *
- * @sa Velocity, Geometric
- * @ingroup geometric
- */
-class Position : public Vector {
-private:
-  /// Instantiates an undefined position vector
-  Position() : Vector() {}
-
-public:
-
-  explicit Position(double x_m, double y_m, double z_m);
-
-  explicit Position(const double pos[3], double unit = Unit::m);
-
-  bool equals(const Position& p, double precision) const;
-
-  bool operator==(const Position& p) const;
-
-  bool operator!=(const Position& p) const;
-
-  Position operator+(const Position &r) const;
-
-  Position operator-(const Position &r) const;
-
-  Coordinate distance() const;
-
-  Position inv() const;
-
-  Spherical to_spherical() const;
-
-  std::string to_string(int decimals = 3) const override;
-
-  static const Position& origin();
-
-  static const Position& undefined();
-};
 
 /**
  * A 3D physical velocity vector in space.
@@ -705,6 +667,50 @@ public:
   static const Velocity& stationary();
 
   static const Velocity& undefined();
+};
+
+
+
+/**
+ * A 3D physical position vector in space.
+ *
+ * @sa Velocity, Geometric
+ * @ingroup geometric
+ */
+class Position : public Vector {
+protected:
+  /// Instantiates an undefined position vector
+  Position() : Vector() {}
+
+public:
+
+  explicit Position(double x_m, double y_m, double z_m);
+
+  explicit Position(const double pos[3], double unit = Unit::m);
+
+  bool equals(const Position& p, double precision) const;
+
+  bool operator==(const Position& p) const;
+
+  bool operator!=(const Position& p) const;
+
+  Position operator+(const Position &r) const;
+
+  Position operator-(const Position &r) const;
+
+  Coordinate distance() const;
+
+  Position inv() const;
+
+  Spherical to_spherical() const;
+
+  ReferencedPosition referenced_to(const Time& time, const Position& ssb_pos = Position::origin()) const;
+
+  virtual std::string to_string(int decimals = 3) const override;
+
+  static const Position& origin();
+
+  static const Position& undefined();
 };
 
 /**
@@ -1767,7 +1773,7 @@ public:
   Time rises_above(const Angle& el, const Frame &frame, RefractionModel ref = NULL, const Weather& weather = Weather::standard()) const;
 
   /// @ingroup time
-  Time transits(const Frame &frame) const;
+  Time transits_in(const Frame &frame) const;
 
   /// @ingroup time
   Time sets_below(const Angle& el, const Frame &frame, RefractionModel ref = NULL, const Weather& weather = Weather::standard()) const;
@@ -1894,6 +1900,8 @@ protected:
 
 public:
 
+  Geometric geometric_at(const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const; // TODO
+
   Coordinate helio_distance(const Time& time) const;
 
   ScalarVelocity helio_rate(const Time& time) const;
@@ -1938,6 +1946,8 @@ public:
 
   /// @ingroup geometric
   Geometric approx_geometric_in(const Frame& frame) const;
+
+  Orbital orbit(const Time& ref_time) const;
 
   std::string to_string() const override;
 
@@ -2074,7 +2084,7 @@ public:
  *     using the builder functions in a multi-threaded environment. The best practice is to build
  *     the orbital first, before using in parallel threads unmodified.
  *
- * @sa EphemerisSource, Planet
+ * @sa EphemerisSource, Planet::orbit()
  * @ingroup source
  */
 class Orbital : public Validating {
@@ -2265,6 +2275,9 @@ public:
   /// @ingroup nonequatorial
   Horizontal to_horizontal() const;
 
+  /// @ingroup geometric
+  ReferencedPosition geometric_position() const;
+
   std::string to_string(int decimals = 3) const;
 
   static Apparent from_cirs(double ra_rad, double dec_rad, const Frame& frame, double rv_ms = 0.0);
@@ -2281,6 +2294,7 @@ public:
 
   static const Apparent& undefined();
 };
+
 
 /**
  * The geometric (3D) position and velocity of a source relative to an observer location. It
@@ -2405,6 +2419,38 @@ public:
 
   static const Horizontal& undefined();
 };
+
+/**
+ * The geometric 3D position of an object, referenced to the Solar System Barycenter (SSB) or else
+ * to a major planet (or Sun, Moon, EMB...) or place in the Solar-system at a specific astrometric
+ * time.
+ *
+ * @sa Geometric, Apparent::geometric_position(), Position::referenced_to()
+ */
+class ReferencedPosition : public Position {
+  private:
+    Time _time;
+    Position _origin;
+
+    ReferencedPosition() : Position(), _time(Time::undefined()), _origin(Position::undefined()) {}
+
+  public:
+
+    ReferencedPosition(const Position& p, const Time& time, const Position& ref_pos = Position::origin());
+
+    const Position& reference() const;
+
+    const Time& time() const;
+
+    const Equatorial equatorial(enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const;
+
+    ReferencedPosition referenced_to(const Position& ssb_pos) const;
+
+    ReferencedPosition referenced_to_ssb() const;
+
+    std::string to_string(int decimals = 3) const override;
+};
+
 
 /**
  * The evolution of a scalar quantity in time, based on a local quadratic approximation.
@@ -2561,6 +2607,8 @@ public:
 
   static EquatorialTrack from_novas_track(const Equinox& system, const novas_track *track, const Interval& range);
 };
+
+
 
 
 } // namespace supernovas

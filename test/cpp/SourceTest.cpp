@@ -89,14 +89,14 @@ int main() {
   if(!test.check("sets_below(gc)", !c.sets_below(Angle(20.0 * Unit::deg), gc).is_valid())) n++;
   if(!test.check("sets_below(invalid geo)", !c.sets_below(Angle(20.0 * Unit::deg), gfx).is_valid())) n++;
 
-  if(!test.equals("transits(geo)",
-          c.transits(gf).jd(),
+  if(!test.equals("transits_in(geo)",
+          c.transits_in(gf).jd(),
           novas_transit_time(c._novas_object(), gf._novas_frame()), 1e-7)) n++;
-  if(!test.equals("transits()",
-          c.transits(frame).jd(),
+  if(!test.equals("transits_in()",
+          c.transits_in(frame).jd(),
           novas_transit_time(c._novas_object(), frame._novas_frame()), 1e-7)) n++;
-  if(!test.check("transits(gc)", !c.transits(gc).is_valid())) n++;
-  if(!test.check("trasits(invalid geo)", !c.transits(gfx).is_valid())) n++;
+  if(!test.check("transits_in(gc)", !c.transits_in(gc).is_valid())) n++;
+  if(!test.check("trasits(invalid geo)", !c.transits_in(gfx).is_valid())) n++;
 
   sky_pos tod = {};
   novas_sky_pos(o, frame._novas_frame(), NOVAS_TOD, &tod);
@@ -164,8 +164,8 @@ int main() {
   if(!test.equals("sets_below(Sun)",
           sun.sets_below(Angle(20.0 * Unit::deg), frame).jd(),
           novas_sets_below(20.0, sun._novas_object(), frame._novas_frame(), NULL), 1e-7)) n++;
-  if(!test.equals("transits(Sun)",
-          sun.transits(frame).jd(),
+  if(!test.equals("transits_in(Sun)",
+          sun.transits_in(frame).jd(),
           novas_transit_time(sun._novas_object(), frame._novas_frame()), 1e-7)) n++;
 
 

@@ -93,7 +93,7 @@ Apparent Source::apparent_in(const Frame& frame) const {
       return app;
   }
 
-  novas_trace_invalid("Source::apparent");
+  novas_trace_invalid("Source::apparent_in");
   return Apparent::undefined();
 }
 
@@ -150,7 +150,7 @@ Geometric Source::geometric_in(const Frame& frame, enum novas_reference_system s
     );
   }
 
-  novas_trace_invalid("Source::geometric");
+  novas_trace_invalid("Source::geometric_in");
   return Geometric::undefined();
 }
 
@@ -175,7 +175,7 @@ static const EOP& extract_eop(const Frame &frame) {
  *                  observation. For observers non near Earth's surface, `Time::undefined()` will
  *                  be returned.
  *
- * @sa sets_below(), transits()
+ * @sa sets_below(), transits_in()
  */
 Time Source::rises_above(const Angle& el, const Frame &frame, RefractionModel ref, const Weather& weather) const {
   static const char *fn = "Source::rises_above()";
@@ -204,10 +204,10 @@ Time Source::rises_above(const Angle& el, const Frame &frame, RefractionModel re
  * @return          the next time the source transits after the frame's observing time, or else
  *                  `Time::undefined()` if the observer is not near Earth's surface .
  *
- * @sa sets_below(), transits()
+ * @sa sets_below(), transits_in()
  */
-Time Source::transits(const Frame &frame) const {
-  static const char *fn = "Source::transits()";
+Time Source::transits_in(const Frame &frame) const {
+  static const char *fn = "Source::transits_in()";
 
   if(frame.observer().is_geodetic())
     return Time(
@@ -234,7 +234,7 @@ Time Source::transits(const Frame &frame) const {
  *                  observation. For observers not near Earth's surface, `Time::undefined()` will
  *                  be returned.
  *
- * @sa rises_above(), transits()
+ * @sa rises_above(), transits_in()
  */
 Time Source::sets_below(const Angle& el, const Frame &frame, RefractionModel ref, const Weather& weather) const {
   static const char *fn = "Source::sets_below()";
@@ -789,6 +789,20 @@ Geometric Planet::approx_geometric_in(const Frame& frame) const {
   return g;
 }
 
+/**
+ * Returns the approximate Keplerian orbital parameters for this planet, calculated for the
+ * specified time of reference.
+ *
+ * @param ref_time    Reference time for the Keplerian orbital parameters.
+ * @return            the approximate Keplerain orbital of this planet around the specified
+ *                    reference time.
+ */
+Orbital Planet::orbit(const Time& ref_time) const {
+  novas_orbital orbit = {};
+  if(novas_make_planet_orbit(novas_id(), ref_time.jd(NOVAS_TDB), &orbit) != 0)
+    novas_trace_invalid("Planet::orbit()");
+  return Orbital::from_novas_orbit(&orbit);
+}
 
 std::string Planet::to_string() const {
   return "Planet " + name();

@@ -36,6 +36,17 @@ int main() {
     if(!test.equals("naif_id(" + std::to_string(i) + ")", pl.naif_id(), (int) novas_to_naif_planet(pl.novas_id()))) n++;
     if(!test.equals("de_number(" + std::to_string(i) + ")", pl.de_number(), (int) novas_to_dexxx_planet(pl.novas_id()))) n++;
 
+    Orbital orb = pl.orbit(Time::b1950());
+    if((i >= NOVAS_MERCURY && i != NOVAS_EARTH && i <= NOVAS_PLUTO) || i == NOVAS_PLUTO_BARYCENTER) {
+      novas_orbital orb0 = {};
+      novas_make_planet_orbit(pl.novas_id(), NOVAS_JD_B1950, &orb0);
+      if(!test.check("orbit(" + std::to_string(i) + ")", orb.is_valid())) n++;
+      if(!test.check("orbit(" + std::to_string(i) + ") == ", memcmp(orb._novas_orbital(), &orb0, sizeof(novas_orbital)))) n++;
+    }
+    else {
+      if(!test.check("orbit(" + std::to_string(i) + ")", !orb.is_valid())) n++;
+    }
+
     Planet opt = Planet::for_naif_id(novas_to_naif_planet((enum novas_planet) i));
     if(!test.check("for_naif_id(" + std::to_string(i) + ").is_valid()", opt.is_valid())) n++;
     if(!test.equals("for_naif_id(" + std::to_string(i) + ").novas_id()", opt.novas_id(), i)) n++;
@@ -43,6 +54,8 @@ int main() {
     const Source *p1 = pl.copy();
     if(!test.check("to_string(catalog)", memcmp(p1->_novas_object(), pl._novas_object(), sizeof(object)) == 0)) n++;
   }
+
+
 
   std::string names[] = NOVAS_PLANET_NAMES_INIT;
   double radius[] = NOVAS_PLANET_RADII_INIT;
