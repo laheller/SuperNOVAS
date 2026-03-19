@@ -220,7 +220,7 @@ Coordinate Apparent::distance() const {
  *
  * @return    the apparent equatorial coordinates in the system in which they were defined.
  *
- * @sa cirs(), ecliptic(), galactic(), to_horizontal()
+ * @sa to_cirs(), ecliptic(), galactic(), to_horizontal()
  */
 Equatorial Apparent::equatorial() const {
   return Equatorial(_pos.ra * Unit::hour_angle, _pos.dec * Unit::deg, Equinox::tod(_frame.time()));
@@ -234,7 +234,7 @@ Equatorial Apparent::equatorial() const {
  *
  * @sa equatorial(), ecliptic(), galactic(), to_horizontal()
  */
-Equatorial Apparent::cirs() const {
+Equatorial Apparent::to_cirs() const {
   return Equatorial((_pos.ra - cirs2tod_ra) * Unit::hour_angle, _pos.dec * Unit::deg, Equinox::cirs(_frame.time()));
 }
 

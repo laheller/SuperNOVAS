@@ -2264,7 +2264,7 @@ public:
   Equatorial equatorial() const;
 
   /// @ingroup equatorial
-  Equatorial cirs() const;
+  Equatorial to_cirs() const;
 
   /// @ingroup nonequatorial
   Ecliptic ecliptic() const;
@@ -2426,6 +2426,8 @@ public:
  * time.
  *
  * @sa Geometric, Apparent::geometric_position(), Position::referenced_to()
+ *
+ * @ingroup geometric
  */
 class ReferencedPosition : public Position {
   private:
@@ -2442,7 +2444,8 @@ class ReferencedPosition : public Position {
 
     const Time& time() const;
 
-    const Equatorial equatorial(enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const;
+    /// @ingroup equatorial
+    Equatorial equatorial(enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const;
 
     ReferencedPosition referenced_to(const Position& ssb_pos) const;
 

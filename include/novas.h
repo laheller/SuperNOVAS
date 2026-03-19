@@ -229,7 +229,7 @@
 
 /// [day] Julian date at B1900 (NASA / NAIF SPICE definition)
 /// precession(), transform_cat()
-/// @ingroup time
+/// @c_time
 #define NOVAS_JD_B1900            2415020.31352
 
 /// [day] Julian date for J1991.25, which the Hipparcos catalog is referred to.
@@ -2933,13 +2933,13 @@ novas_planet_provider get_planet_provider();
 novas_planet_provider_hp get_planet_provider_hp();
 
 // in naif.c
-/// @ingroup source
+/// @c_source
 enum novas_planet naif_to_novas_planet(long id);
 
-/// @ingroup source
+/// @c_source
 long novas_to_naif_planet(enum novas_planet id);
 
-/// @ingroup source
+/// @c_source
 long novas_to_dexxx_planet(enum novas_planet id);
 
 /// @c_source
@@ -3303,10 +3303,10 @@ int novas_itrs_to_enu(const double *itrf, double lon, double lat, double *enu);
 /// @ingroup observer
 int novas_enu_to_itrs(const double *enu, double lon, double lat, double *itrf);
 
-/// @ingroup time
+/// @c_time
 double novas_diff_time_scale(const novas_timespec *t1, const novas_timespec *t2, enum novas_timescale scale);
 
-/// @ingroup time
+/// @c_time
 int novas_time_leap(const novas_timespec *time);
 
 // <================= END of SuperNOVAS API =====================>

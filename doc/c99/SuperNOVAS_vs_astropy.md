@@ -26,8 +26,7 @@ from astropy.coordinates import SkyCoord,
    
 # Define ICRS coordinates
 source = SkyCoord(
-  '16h 29m 24.45970s', 
-  '−26d 25m 55.2094s',
+  '16h 29m 24.45970s', '−26d 25m 55.2094s',
   d = u.AU / 5.89 * u.mas,
   pmra = -12.11 * u.mas / u.yr,
   pmdec = -23.30 * u.mas / u.yr,
@@ -49,7 +48,6 @@ frame = CIRS(obstime=time, location=loc)
 
 
 # apparent coordinates
-
 app = source.transform_to(frame); 
 ```
 
@@ -64,7 +62,7 @@ object source;
 observer loc;
 novas_timespec time;
 novas_frame frame;
-sky_pos apparent;
+sky_pos app;
 
 // Define ICRS coordinates
 make_cat_entry("Antares", "HIP", 80763, 
@@ -73,7 +71,6 @@ make_cat_entry("Antares", "HIP", 80763,
   -12.11, -23.30, 5.89, -3.4, &star);
   
 make_cat_object(&star, &source);
-
 
 // Observer location
 make_gps_observer(50.7374, 7.0982, 60.0,
@@ -91,8 +88,7 @@ novas_make_frame(NOVAS_FULL_ACCURACY,
   &loc, &time, DX, DY, &frame);
 
 // apparent coordinates in system
-novas_sky_pos(&source, &frame, NOVAS_CIRS, 
-  &apparent);
+novas_sky_pos(&source, &frame, NOVAS_CIRS, &app);
 ```
 
 </td>

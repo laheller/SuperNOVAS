@@ -18,7 +18,7 @@ object source;
 observer loc;
 novas_timespec time;
 novas_frame frame;
-sky_pos apparent;
+sky_pos app;
 
 // Define ICRS coordinates
 make_cat_entry("Antares", "HIP", 80763, 
@@ -27,9 +27,7 @@ make_cat_entry("Antares", "HIP", 80763,
   -12.11, -23.30, 5.89, -3.4, &star);
   
   
-  
 make_cat_object(&star, &source);
-
 
 
 
@@ -49,8 +47,7 @@ novas_make_frame(NOVAS_FULL_ACCURACY,
   &loc, &time, DX, DY, &frame);
 
 // apparent coordinates in system
-novas_sky_pos(&source, &frame, NOVAS_CIRS, 
-  &apparent);
+novas_sky_pos(&source, &frame, NOVAS_CIRS, &app);
 ```
 
 
@@ -69,8 +66,7 @@ using namespace supernovas;
 
 // Define ICRS coordinates
 auto source = CatalogEntry("Antares", 
-    "16h 29m 24.45970s", 
-    "−26d 25m 55.2094s")
+    "16h 29m 24.45970s", "−26d 25m 55.2094s")
   .parallax(5.89 * Unit::mas)
   .proper_motion(-12.11 * Unit::mas / Unit::yr, 
     -23.30 * Unit::mas / Unit::yr)
@@ -95,8 +91,7 @@ auto frame = obs.frame_at(t);
 
 
 // apparent coordinates in system
-if(frame)
-  auto app = source.apparent_in(*frame).cirs();
+auto app = source.apparent_in(frame).to_cirs();
 ```
 
 </td>

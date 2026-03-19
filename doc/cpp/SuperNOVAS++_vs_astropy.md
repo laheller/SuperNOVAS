@@ -18,8 +18,7 @@ from astropy.coordinates import SkyCoord,
 
 # Define ICRS coordinates
 source = SkyCoord(
-  '16h 29m 24.45970s', 
-  '−26d 25m 55.2094s',
+  '16h 29m 24.45970s', '−26d 25m 55.2094s',
   d = u.AU / 5.89 * u.mas,
   pmra = -12.11 * u.mas / u.yr,
   pmdec = -23.30 * u.mas / u.yr,
@@ -45,7 +44,6 @@ time = astropy.time.Time(
 frame = CIRS(obstime=time, location=loc)
 
 # apparent coordinates
-
 app = source.transform_to(frame);
 ```
 
@@ -60,8 +58,7 @@ using namespace supernovas;
 
 // Define ICRS coordinates
 auto source = CatalogEntry("Antares", 
-    "16h 29m 24.45970s", 
-    "−26d 25m 55.2094s")
+    "16h 29m 24.45970s", "−26d 25m 55.2094s")
   .parallax(5.89 * Unit::mas)
   .proper_motion(-12.11 * Unit::mas / Unit::yr, 
     -23.30 * Unit::mas / Unit::yr)
@@ -87,8 +84,7 @@ Time t("2026-03-14T13:43:00.728+0200", eop,
 auto frame = obs.frame_at(t);
 
 // apparent coordinates in system
-if(frame)
-  auto app = source.apparent_in(*frame).cirs();
+auto app = source.apparent_in(frame).to_cirs();
 ```
 
 </td>

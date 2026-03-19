@@ -72,7 +72,7 @@ const Time& ReferencedPosition::time() const {
  *                    of this position. Aberration corrections are applied if the
  *                    reference place is defined to be moving relative to the SSB.
  */
-const Equatorial ReferencedPosition::equatorial(enum novas_accuracy accuracy) const {
+Equatorial ReferencedPosition::equatorial(enum novas_accuracy accuracy) const {
   double ra = NAN, dec = NAN;
   vector2radec(_array(), &ra, &dec);
 
