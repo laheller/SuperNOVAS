@@ -13,7 +13,7 @@ on:
       - 'Makefile'
       - '*.mk'
       - '.github/workflows/analyze.yml'
-      
+
   pull_request:
     paths:
       - 'src/**'
@@ -36,6 +36,9 @@ jobs:
     
     - name: install dependencies
       run: sudo apt-get install -y cppcheck
-    
-    - name: Run cppcheck
-      run: make analyze
+
+    - name: Run cppcheck on the C sources
+      run: make -C src/c99 analyze
+
+    - name: Run cppcheck on the C++ sources
+      run: make -C src/cpp analyze

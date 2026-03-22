@@ -9,8 +9,10 @@ include ../config.mk
 
 BENCHMARKS = benchmark-nutation benchmark-place
 
+LIB ?= ../lib
+
 CPPFLAGS += -I../include
-LDFLAGS += -L../$(LIB) -lsupernovas
+LDFLAGS += -L$(LIB) -lsupernovas
 
 .PHONY: all
 all: build run
@@ -20,7 +22,7 @@ build: $(BENCHMARKS)
 
 .PHONY: run
 run: build
-	@for prog in $(BENCHMARKS) ; do $(LIB_PATH_VAR)=../$(LIB) ./$${prog} ; done
+	@for prog in $(BENCHMARKS) ; do $(LIB_PATH_VAR)=$(LIB) ./$${prog} ; done
 
 .PHONY: clean
 clean:

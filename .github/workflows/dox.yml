@@ -60,7 +60,12 @@ jobs:
 
     - uses: mattnotmitt/doxygen-action@edge
       with:
-        working-directory: 'doc/'
+        working-directory: 'doc/c99'
+        additional-packages: font-roboto
+
+    - uses: mattnotmitt/doxygen-action@edge
+      with:
+        working-directory: 'doc/cpp'
         additional-packages: font-roboto
 
     - name: Checkout gh-pages
@@ -77,12 +82,15 @@ jobs:
         rm doc/README.md
         mv doc/README-undecorated.md doc/README.md
         cp doc/*.md site/doc/
+        cp doc/cpp/*.md site/doc/
 
     - name: Copy CHANGELOG
       run: cp -a CHANGELOG.md site/doc/
 
     - name: Copy API documentation
-      run: cp -a doc/html site/doc/
+      run: |
+        cp -a doc/c99/html site/doc/
+        cp -a doc/cpp/html site/doc/html/cpp
         
     - name: Assert site/resources/
       run: mkdir -p site/resources

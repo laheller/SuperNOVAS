@@ -36,7 +36,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CC: gcc
+      CXX: g++
       CFLAGS: -O0
+      ENABLE_CPP: 1
     steps:
 
     - uses: actions/checkout@v6
@@ -48,8 +50,8 @@ jobs:
 
     - name: Run regression tests
       run: make test
-
-    - name: Generate coverage data
+    
+    - name: Generate test coverage
       run: make coverage
 
     - name: Upload coverage to Codecov.io
@@ -65,7 +67,6 @@ jobs:
     - name: Upload coverage to Coveralls.io
       continue-on-error: true
       uses: coverallsapp/github-action@v2
-
 
   test-linux:
     name: Linux ${{ matrix.arch }}

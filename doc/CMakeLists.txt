@@ -1,6 +1,5 @@
 # Additional CMake configuration file for building the documentation of the 
-# SuperNOVAS library. The examples are also added to the test suite so they 
-# may be checked for functionality.
+# SuperNOVAS library.
 #
 # To invoke simply configure the cmake build in the supernovas directory with
 # the -DBUILD_DOC=ON option.
@@ -33,28 +32,11 @@ set_package_properties(Doxygen PROPERTIES
     PURPOSE "Enables HTML documentation for supernovas"
 )
 
-if(Doxygen_FOUND)
-    # Generate headless docs and run Doxygen on them.
-    doxygen_add_docs(project_docs ALL CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
-    add_dependencies(project_docs headless_readme)
+add_subdirectory(c99)
     
-     # For html/ dir, list just the directory, not the individual files installed.
-    install(CODE "message(STATUS \"Installing: <prefix>/${CMAKE_INSTALL_DOCDIR}/html/*\")")
-    install(DIRECTORY html
-        DESTINATION ${CMAKE_INSTALL_DOCDIR}
-        MESSAGE_NEVER
-        COMPONENT Development
-    )
-
-    # Install Doxygen tag, which downstream docs can link to.
-    install(FILES supernovas.tag
-        DESTINATION ${CMAKE_INSTALL_DOCDIR}
-        COMPONENT Development
-    )
-else()
-    message(WARNING "Doxygen not found -- Will skip generating HTML documentation")
+if(ENABLE_CPP)
+    add_subdirectory(cpp)
 endif()
-    
     
 
    
