@@ -28,6 +28,9 @@ int main() {
   if(!test.check("to_ecliptic() invalid", !x.to_ecliptic().is_valid())) n++;
   if(!test.check("to_galactic() invalid", !x.to_galactic().is_valid())) n++;
   if(!test.check("to_icrs() invalid", !x.to_icrs().is_valid())) n++;
+  if(!test.check("to_j2000() invalid", !x.to_j2000().is_valid())) n++;
+  if(!test.check("to_hip() invalid", !x.to_hip().is_valid())) n++;
+  if(!test.check("operator>>() invalid", !(x >> Equinox::icrs()).is_valid())) n++;
 
   Equatorial a = Equatorial(Angle(45.0 * Unit::deg), Angle(30.0 * Unit::deg), Equinox::icrs());
   if(!test.check("is_valid()", a.is_valid())) n++;
@@ -38,6 +41,8 @@ int main() {
   if(!test.check("to_icrs(ICRS)", a.to_icrs() == a)) n++;
   if(!test.equals("to_string(ICRS)", a.to_string(NOVAS_SEP_COLONS), "EQU 03:00:00.0000    30:00:00.000  ICRS")) n++;
   if(!test.check("to_system(invalid)", !a.to_system(Equinox::undefined()).is_valid())) n++;
+  if(!test.check("distance_to() invalid", !x.distance_to(a).is_valid())) n++;
+  if(!test.check("invalid.distance_to()", !a.distance_to(x).is_valid())) n++;
 
   double p0[3] = {0.0}, z[3] = {0.0};
   Position pos(z, Unit::pc);

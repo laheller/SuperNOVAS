@@ -21,6 +21,9 @@ int main() {
   if(!test.check("x() invalid", isnan(x.x()))) n++;
   if(!test.check("y() invalid", isnan(x.y()))) n++;
   if(!test.check("z() invalid", isnan(x.z()))) n++;
+  if(!test.check("operator+() invalid", !(x + Position::origin()).is_valid())) n++;
+  if(!test.check("operator-() invalid", !(x - Position::origin()).is_valid())) n++;
+  if(!test.check("inv() invalid", !x.inv().is_valid())) n++;
 
   Position z = Position::origin();
   if(!test.check("is_valid() origin", z.is_valid())) n++;
@@ -28,6 +31,8 @@ int main() {
   if(!test.equals("y() origin", z.y(), 0.0)) n++;
   if(!test.equals("z() origin", z.z(), 0.0)) n++;
   if(!test.check("is_zero(origin)", z.is_zero())) n++;
+  if(!test.check("operator+(invalid)", !(z + x).is_valid())) n++;
+  if(!test.check("operator-(invalid)", !(z - x).is_valid())) n++;
 
   if(!test.check("invalid x", !Position(NAN, 0.0, 0.0).is_valid())) n++;
   if(!test.check("invalid x", !Position(0.0, NAN, 0.0).is_valid())) n++;

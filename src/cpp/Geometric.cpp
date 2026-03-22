@@ -320,7 +320,8 @@ Geometric Geometric::to_tirs() const {
  * check on the validity of the returned value, e.g. as:
  *
  * ```c++
- *  Geometric g = ...;
+ *  Geometric g = ...; // geometric coordinates defined in some reference system
+ *
  *  Geometric itrs = g.to_itrs(eop);
  *  if(!itrs) {
  *    // Oops, there was no valid EOP to calculate true ITRS values.

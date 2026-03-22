@@ -127,10 +127,7 @@ CalendarDate Calendar::date(double jd) const {
  * @sa date(), date(double)
  */
 CalendarDate Calendar::date(time_t t, long nanos) const {
-  CalendarDate d(*this, NOVAS_JD_J2000 + ((t - UNIX_UTC_J2000) + nanos * Unit::ns) / Unit::day);
-  if(!d.is_valid())
-    novas_trace_invalid("Calendar::date()");
-  return d;
+  return CalendarDate(*this, NOVAS_JD_J2000 + ((t - UNIX_UTC_J2000) + nanos * Unit::ns) / Unit::day);
 }
 
 /**

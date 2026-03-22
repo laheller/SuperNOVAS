@@ -18,9 +18,10 @@ int main() {
 
   EOP x = EOP::undefined();
   if(!test.check("undefined()", !x.is_valid())) n++;
-  if(!test.check("undefined().dUT1()", !x.dUT1().is_valid())) n++;
-  if(!test.check("undefined().xp()", !x.xp().is_valid())) n++;
-  if(!test.check("undefined().yp()", !x.yp().is_valid())) n++;
+  if(!test.check("dUT1(invalid)", !x.dUT1().is_valid())) n++;
+  if(!test.check("xp(invalid)", !x.xp().is_valid())) n++;
+  if(!test.check("yp(invalid)", !x.yp().is_valid())) n++;
+  if(!test.check("itrf_transformed(invalid)", !x.itrf_transformed(2008, 2014).is_valid())) n++;
 
   if(!test.check("invalid(dut1 = NAN)", !EOP(0, NAN, 0.0, 0.0).is_valid())) n++;
   if(!test.check("invalid(dut1 < -1s)", !EOP(0, -1.1, 0.0, 0.0).is_valid())) n++;

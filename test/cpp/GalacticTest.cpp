@@ -34,6 +34,8 @@ int main() {
   if(!test.check("is_valid(double)", a.is_valid())) n++;
   if(!test.equals("longitude(double)", a.longitude().deg(), 45.0, 1e-14)) n++;
   if(!test.equals("latitude(double)", a.latitude().deg(), 30.0, 1e-14)) n++;
+  if(!test.check("distance_to(invalid)", !a.distance_to(x).is_valid())) n++;
+  if(!test.check("invalid.distance_to()", !x.distance_to(a).is_valid())) n++;
 
   Galactic a1("45d00:00.000", "+30 00m 00");
   if(!test.check("is_valid(string)", a1.is_valid())) n++;

@@ -181,10 +181,11 @@ Geometric Frame::geometric(const Position& p, const Velocity& v, enum novas_refe
  * @sa observer_velocity(), observer()
  */
 Position Frame::observer_position() const {
-  Position p(_novas_frame()->obs_pos, Unit::AU);
-  if(!p.is_valid())
+  if(!is_valid()) {
     novas_trace_invalid("Frame::observer_position()");
-  return p;
+    return Position::undefined();
+  }
+  return Position(_novas_frame()->obs_pos, Unit::AU);
 }
 
 /**
@@ -195,10 +196,11 @@ Position Frame::observer_position() const {
  * @sa observer_position(), observer()
  */
 Velocity Frame::observer_velocity() const {
-  Velocity v(_novas_frame()->obs_vel, Unit::AU / Unit::day);
-  if(!v.is_valid())
+  if(!is_valid()) {
     novas_trace_invalid("Frame::observer_velocity()");
-  return v;
+    return Velocity::undefined();
+  }
+  return Velocity(_novas_frame()->obs_vel, Unit::AU / Unit::day);
 }
 
 /**

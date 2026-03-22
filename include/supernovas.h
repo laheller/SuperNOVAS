@@ -937,6 +937,8 @@ public:
 
   enum novas_equator_type equator_type() const;
 
+  Equinox system() const;
+
   double jd() const;
 
   double mjd() const;

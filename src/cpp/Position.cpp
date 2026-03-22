@@ -95,7 +95,7 @@ bool Position::operator!=(const Position& p) const {
 Position Position::operator+(const Position& r) const {
   Position p(x() + r.x(), y() + r.y(), z() + r.z());
   if(!p.is_valid())
-    novas_trace_invalid("Position::operator-()");
+    novas_trace_invalid("Position::operator+()");
   return p;
 }
 

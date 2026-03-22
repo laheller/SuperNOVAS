@@ -41,7 +41,7 @@ Site::Site(double longitude_rad, double latitude_rad, double altitude_m, enum no
     novas_set_errno(EINVAL, fn, "altitude is more than 10 km below surface: %g m", altitude_m);
   else if(altitude_m > 100000.0)
     novas_set_errno(EINVAL, fn, "altitude is more than 100 km above surface: %g m", altitude_m);
-  else if((unsigned) ellipsoid > NOVAS_REFERENCE_ELLIPSOIDS)
+  else if((unsigned) ellipsoid >= NOVAS_REFERENCE_ELLIPSOIDS)
     novas_set_errno(EINVAL, fn, "invalid reference ellipsoid: %d", ellipsoid);
   else
     _valid = true;

@@ -27,17 +27,24 @@ int main() {
   if(!test.check("latitude() invalid", isnan(x.latitude().rad()))) n++;
   if(!test.check("to_equatorial() invalid", !x.to_equatorial().is_valid())) n++;
   if(!test.check("to_galactic() invalid", !x.to_galactic().is_valid())) n++;
-
+  if(!test.check("to_system() invalid", !x.to_system(Equinox::icrs()).is_valid())) n++;
+  if(!test.check("to_icrs() invalid", !x.to_icrs().is_valid())) n++;
+  if(!test.check("to_j2000() invalid", !x.to_j2000().is_valid())) n++;
+  if(!test.check("operator>>() invalid", !(x >> Equinox::icrs()).is_valid())) n++;
 
   Ecliptic a = Ecliptic(Angle(45.0 * Unit::deg), Angle(30.0 * Unit::deg), Equinox::icrs());
   if(!test.check("is_valid()", a.is_valid())) n++;
   if(!test.equals("longitude()", a.longitude().deg(), 45.0, 1e-14)) n++;
   if(!test.equals("latitude()", a.latitude().deg(), 30.0, 1e-14)) n++;
-  if(!test.equals("equator(ICRS)", a.equator_type(), NOVAS_GCRS_EQUATOR)) n++;
+  if(!test.equals("equator_type(ICRS)", a.equator_type(), NOVAS_GCRS_EQUATOR)) n++;
+  if(!test.check("system(ICRS)", a.system() == Equinox::icrs())) n++;
   if(!test.equals("jd(ICRS)", a.jd(), NOVAS_JD_J2000)) n++;
   if(!test.equals("mjd(ICRS)", a.mjd(), NOVAS_JD_J2000 - NOVAS_JD_MJD0)) n++;
   if(!test.check("to_icrs(ICRS)", a.to_icrs() == a)) n++;
   if(!test.equals("to_string(ICRS)", a.to_string(NOVAS_SEP_COLONS), "ECL   45:00:00.000   30:00:00.000  ICRS")) n++;
+  if(!test.check("invalid.distance_to()", !x.distance_to(a).is_valid())) n++;
+  if(!test.check("distance_to(invalid)", !a.distance_to(x).is_valid())) n++;
+  if(!test.check("to_system(invalid equinox)", !a.to_system(Equinox::undefined()).is_valid())) n++;
 
   Ecliptic a1 = Ecliptic("45:00 00.000", "30d 00m00s", Equinox::icrs());
   if(!test.check("is_valid() Ecliptic(string)", a1.is_valid())) n++;
@@ -51,6 +58,7 @@ int main() {
   if(!test.equals("to_icrs().to_j2000().longitude()", b1.longitude().deg(), b.longitude().deg(), 1e-12)) n++;
   if(!test.equals("to_icrs(J2000).to_j2000().latitude()", b1.latitude().deg(), b.latitude().deg(), 1e-12)) n++;
   if(!test.equals("equator(J2000)", b.equator_type(), NOVAS_MEAN_EQUATOR)) n++;
+  if(!test.check("system(J2000)", b.system() == Equinox::j2000())) n++;
   if(!test.equals("jd(J2000)", b.jd(), NOVAS_JD_J2000)) n++;
   if(!test.check("to_j2000(J2000)", b.to_j2000() == b)) n++;
   if(!test.check("to_mod(J2000)", b.to_mod(NOVAS_JD_J2000) == b)) n++;
@@ -62,6 +70,7 @@ int main() {
   if(!test.equals("to_icrs().to_mod().longitude()", c1.longitude().deg(), c.longitude().deg(), 1e-12)) n++;
   if(!test.equals("to_icrs().to_mod().latitude()", c1.latitude().deg(), c.latitude().deg(), 1e-12)) n++;
   if(!test.equals("equator(B1950)", c.equator_type(), NOVAS_MEAN_EQUATOR)) n++;
+  if(!test.check("system(B1950)", c.system() == Equinox::b1950())) n++;
   if(!test.equals("jd(B1950)", c.jd(), NOVAS_JD_B1950)) n++;
   if(!test.check("to_mod(B1950)", c.to_mod(NOVAS_JD_B1950) == c)) n++;
   if(!test.check("to_mod(NAN)", !c.to_mod(NAN).is_valid())) n++;
@@ -72,6 +81,7 @@ int main() {
   if(!test.equals("to_icrs().to_tod().longitude()", d1.longitude().deg(), d.longitude().deg(), 1e-12)) n++;
   if(!test.equals("to_icrs().to_tod().latitude()", d1.latitude().deg(), d.latitude().deg(), 1e-12)) n++;
   if(!test.equals("equator(TOD)", d.equator_type(), NOVAS_TRUE_EQUATOR)) n++;
+  if(!test.check("system(TOD)", d.system() == Equinox::tod(Time::b1900()))) n++;
   if(!test.equals("jd(B1900)", d.jd(), NOVAS_JD_B1900)) n++;
   if(!test.check("to_tod(B1900)", d.to_tod(NOVAS_JD_B1900) == d)) n++;
   if(!test.check("to_tod(NAN)", !c.to_tod(NAN).is_valid())) n++;

@@ -339,10 +339,7 @@ AstrometricPosition Apparent::astrometric_position() const {
     return AstrometricPosition(Position::undefined(), _frame, NOVAS_TOD);
   }
 
-  AstrometricPosition a(Position(p, Unit::au), _frame, NOVAS_TOD);
-  if(!a.is_valid())
-    novas_trace_invalid("Apparent::astrometric_position()");
-  return a;
+  return AstrometricPosition(Position(p, Unit::au), _frame, NOVAS_TOD);
 }
 
 /**

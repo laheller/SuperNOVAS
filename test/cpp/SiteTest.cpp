@@ -25,6 +25,17 @@ int main() {
   if(!test.check("invalid (alt > 100km)", !Site(Angle(-2.0), Angle(1.0), Coordinate(100.1 * Unit::km)).is_valid())) n++;
   if(!test.check("invalid (ellipsoid = -1)", !Site(Angle(-2.0), Angle(1.0), Coordinate(60.0), (enum novas_reference_ellipsoid) -1).is_valid())) n++;
 
+  Site x = Site::undefined();
+  if(!test.check("invalid", !x.is_valid())) n++;
+  if(!test.check("altitude() invalid", !x.altitude().is_valid())) n++;
+  if(!test.check("xyz() invalid", !x.xyz().is_valid())) n++;
+  if(!test.check("itrf_transformed() invalid", !x.itrf_transformed(2008, 2014).is_valid())) n++;
+  if(!test.check("itrs_to_enu(Position&) invalid", !x.itrs_to_enu(Position::origin()).is_valid())) n++;
+  if(!test.check("itrs_to_enu(Velocity&) invalid", !x.itrs_to_enu(Velocity::stationary()).is_valid())) n++;
+  if(!test.check("enu_to_itrs(Position&) invalid", !x.enu_to_itrs(Position::origin()).is_valid())) n++;
+  if(!test.check("enu_to_itrs(Velocity&) invalid", !x.enu_to_itrs(Velocity::stationary()).is_valid())) n++;
+
+
   double p[3] = {NOVAS_EARTH_RADIUS, 0.0, NAN};
   if(!test.check("invalid (xyz has NAN)", !Site(Position(p)).is_valid())) n++;
 

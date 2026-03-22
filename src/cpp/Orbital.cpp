@@ -655,19 +655,14 @@ double Orbital::node_rate() const {
  * @sa velocity()
  */
 Position Orbital::position(const Time& time, enum novas_accuracy accuracy) const {
-  static const char *fn = "Orbital::velocity()";
-
   double x[3] = {0.0};
 
   if(novas_orbit_posvel(time.jd(), &_orbit, accuracy, x, NULL) != 0) {
-    novas_trace_invalid(fn);
+    novas_trace_invalid("Orbital::velocity()");
     return Position::undefined();
   }
 
-  Position pos(x, Unit::au);
-  if(!pos.is_valid())
-    novas_trace_invalid(fn);
-  return pos;
+  return Position(x, Unit::au);
 }
 
 /**
@@ -691,19 +686,14 @@ Position Orbital::position(const Time& time, enum novas_accuracy accuracy) const
  * @sa position()
  */
 Velocity Orbital::velocity(const Time& time, enum novas_accuracy accuracy) const {
-  static const char *fn = "Orbital::velocity()";
-
   double v[3] = {0.0};
 
   if(novas_orbit_posvel(time.jd(), &_orbit, accuracy, NULL, v) != 0) {
-    novas_trace_invalid(fn);
+    novas_trace_invalid("Orbital::velocity()");
     return Velocity::undefined();
   }
 
-  Velocity vel(v, Unit::au / Unit::day);
-  if(!vel.is_valid())
-    novas_trace_invalid(fn);
-  return vel;
+  return Velocity(v, Unit::au / Unit::day);
 }
 
 /**

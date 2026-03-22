@@ -21,6 +21,11 @@ int main() {
   if(!test.check("is_valid(NAN)", !x.is_valid())) n++;
   if(!test.check("isnan(NAN)", isnan(x.m_per_s()))) n++;
   if(!test.equals("zero()", ScalarVelocity::stationary().m_per_s(), 0.0)) n++;
+  if(!test.check("abs(NAN)", !x.abs().is_valid())) n++;
+  if(!test.check("NAN.travel()", !x.travel(1.0).is_valid())) n++;
+  if(!test.check("NAN.operator*()", !(x * Interval(1.0)).is_valid())) n++;
+  if(!test.check("NAN.operator+()", !(x + ScalarVelocity::stationary()).is_valid())) n++;
+  if(!test.check("NAN.operator-()", !(x - ScalarVelocity::stationary()).is_valid())) n++;
 
   if(!test.check("is_valid(> c)", !ScalarVelocity(Constant::c + 1.0).is_valid())) n++;
 
@@ -37,6 +42,10 @@ int main() {
   if(!test.equals("in_direction()", a.in_direction(Position(0.0, 5.0, 0.0)).y(), 45.0 * Unit::km / Unit::s, 1e-12)) n++;
   if(!test.equals("in_direction(x)", a.in_direction(Position(0.0, 5.0, 0.0)).x(), 0.0, 1e-15)) n++;
   if(!test.check("in_direction(invalid)", !a.in_direction(Position::undefined()).is_valid())) n++;
+  if(!test.check("travel(NAN)", !a.travel(NAN).is_valid())) n++;
+  if(!test.check("operator*(invalid interval)", !(a * Interval(NAN)).is_valid())) n++;
+  if(!test.check("operator+(invalid)", !(a + x).is_valid())) n++;
+  if(!test.check("operator-(invalid)", !(a - x).is_valid())) n++;
 
   ScalarVelocity b(-30.0 * Unit::km / Unit::s);
   if(!test.equals("km_per_s(-30 km/s)", b.km_per_s(), -30.0)) n++;

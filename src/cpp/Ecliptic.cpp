@@ -205,6 +205,28 @@ double Ecliptic::mjd() const {
 }
 
 /**
+ * Returns the equinox of date relative to which these ecliptic coordinates are defined.
+ *
+ * @return    the equinox of date, which these ecliptic coordinates are based on.
+ */
+Equinox Ecliptic::system() const {
+  switch(_equator) {
+    case NOVAS_GCRS_EQUATOR:
+      return Equinox::icrs();
+    case NOVAS_MEAN_EQUATOR:
+      if(_jd == NOVAS_JD_J2000)
+        return Equinox::j2000();
+      else
+        return Equinox::mod(_jd);
+    case NOVAS_TRUE_EQUATOR:
+      return Equinox::tod(_jd);
+    default:
+      novas_set_errno(EINVAL, "Ecliptic::system()", "invalid equator type: %s", _equator);
+      return Equinox::undefined();
+  }
+}
+
+/**
  * Returns the angular distance of these ecliptic coordiantes to/from the specified other
  * ecliptic coordinates.
  *
@@ -212,7 +234,7 @@ double Ecliptic::mjd() const {
  * @return        the angular distance of these coordinates to/from the argument.
  */
 Angle Ecliptic::distance_to(const Ecliptic& other) const {
-  Angle a = Spherical::distance_to(other);
+  Angle a = Spherical::distance_to(other >> system());
   if(!a.is_valid())
     novas_trace_invalid("Ecliptic::distance_to()");
   return a;
@@ -357,22 +379,8 @@ Ecliptic Ecliptic::to_tod(const Time& time) const {
 Equatorial Ecliptic::to_equatorial() const {
   if(is_valid()) {
     double ra = 0.0, dec = 0.0;
-
     ecl2equ(_jd, _equator, NOVAS_FULL_ACCURACY, longitude().deg(), latitude().deg(), &ra, &dec);
-
-    if(isfinite(ra) && isfinite(dec)) {
-      switch(_equator) {
-        case NOVAS_GCRS_EQUATOR:
-          return Equatorial(ra * Unit::hour_angle, dec * Unit::deg, Equinox::icrs());
-        case NOVAS_MEAN_EQUATOR:
-          if(_jd == NOVAS_JD_J2000)
-            return Equatorial(ra * Unit::hour_angle, dec * Unit::deg, Equinox::j2000());
-          else
-            return Equatorial(ra * Unit::hour_angle, dec * Unit::deg, Equinox::mod(_jd));
-        case NOVAS_TRUE_EQUATOR:
-          return Equatorial(ra * Unit::hour_angle, dec * Unit::deg, Equinox::tod(_jd));
-      }
-    }
+    return Equatorial(ra * Unit::hour_angle, dec * Unit::deg, system());
   }
 
   novas_set_errno(ERANGE, "Ecliptic::to_equatorial()", "Invalid Ecliptic instance");

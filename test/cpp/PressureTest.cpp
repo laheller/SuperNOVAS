@@ -20,6 +20,12 @@ int main() {
   if(!test.check("is_valid(NAN)", !x.is_valid())) n++;
   if(!test.check("isnan(NAN)", isnan(x.Pa()))) n++;
   if(!test.check("!is_valid(-1 Pa)", !Pressure::Pa(-1.0).is_valid())) n++;
+  if(!test.check("!is_valid(-1 hPa)", !Pressure::hPa(-1.0).is_valid())) n++;
+  if(!test.check("!is_valid(-1 kPa)", !Pressure::kPa(-1.0).is_valid())) n++;
+  if(!test.check("!is_valid(-1 mbar)", !Pressure::mbar(-1.0).is_valid())) n++;
+  if(!test.check("!is_valid(-1 bar)", !Pressure::bar(-1.0).is_valid())) n++;
+  if(!test.check("!is_valid(-1 torr)", !Pressure::torr(-1.0).is_valid())) n++;
+  if(!test.check("!is_valid(-1 atm)", !Pressure::atm(-1.0).is_valid())) n++;
 
   Pressure a = Pressure::Pa(1e5);
   if(!test.check("is_valid(100 hPa)", a.is_valid())) n++;

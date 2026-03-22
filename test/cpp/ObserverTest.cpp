@@ -53,6 +53,14 @@ int main() {
 
 
   test = TestUtil("GeodeticObserver");
+
+  GeodeticObserver gdx =  Observer::moving_on_earth(Site::undefined(), Velocity::undefined(), EOP::undefined());
+  if(!test.check("is_valid(invalid)", !gdx.is_valid())) n++;
+  if(!test.check("site(invalid)", !gdx.site().is_valid())) n++;
+  if(!test.check("itrs_velocity(invalid)", !gdx.itrs_velocity().is_valid())) n++;
+  if(!test.check("enu_velocity(invalid)", !gdx.enu_velocity().is_valid())) n++;
+
+
   GeodeticObserver g1 = Observer::on_earth(site, eop);
   if(!test.check("is_valid(on_earth)", g1.is_valid())) n++;
   if(!test.equals("type(on_earth)", g1.type(), NOVAS_OBSERVER_ON_EARTH)) n++;
@@ -115,6 +123,12 @@ int main() {
   test = TestUtil("GeocentricObserver");
 
   Position p1(10000.0 * Unit::km, 0.0, 0.0);
+
+  GeocentricObserver ogx = Observer::in_earth_orbit(Position::undefined(), Velocity::undefined());
+  if(!test.check("is_valid(orbit invalid)", !ogx.is_valid())) n++;
+  if(!test.check("geocentric_position(orbit invalid)", !ogx.geocentric_position().is_valid())) n++;
+  if(!test.check("geocentric_velocity(orbit invalid)", !ogx.geocentric_velocity().is_valid())) n++;
+
   GeocentricObserver o1 = Observer::in_earth_orbit(p1, v1);
   if(!test.check("is_valid(orbit)", o1.is_valid())) n++;
   if(!test.equals("type(orbit)", o1.type(), NOVAS_OBSERVER_IN_EARTH_ORBIT)) n++;
@@ -147,6 +161,11 @@ int main() {
 
   Position p2(-1.1 * Unit::au, 2.2 * Unit::au, -3.3 * Unit::au);
   Velocity v2(1.0 * Unit::au / Unit::day, -2.0 * Unit::au / Unit::day, 3.0 * Unit::au / Unit::day);
+
+  SolarSystemObserver sx = Observer::in_solar_system(Position::undefined(), Velocity::undefined());
+  if(!test.check("is_valid(invalid)", !sx.is_valid())) n++;
+  if(!test.check("ssb_position(invalid)", !sx.ssb_position().is_valid())) n++;
+  if(!test.check("ssb_velocity(invalid)", !sx.ssb_velocity().is_valid())) n++;
 
   SolarSystemObserver s1 = Observer::in_solar_system(p2, v2);
   if(!test.check("is_valid(ss)", s1.is_valid())) n++;

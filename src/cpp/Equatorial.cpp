@@ -199,7 +199,7 @@ enum novas_reference_system Equatorial::system_type() const {
  * @return        the angular distance of thereturn Angle::operator+(r);se coordinates to/from the argument.
  */
 Angle Equatorial::distance_to(const Equatorial& other) const {
-  Angle a = Spherical::distance_to(other);
+  Angle a = Spherical::distance_to(other >> _sys);
   if(!a.is_valid())
     novas_trace_invalid("Equatorial::distance_to()");
   return a;
@@ -482,12 +482,10 @@ const Angle& Equatorial::dec() const {
  * @sa Ecliptic::to_equatorial(), to_galactic()
  */
 Ecliptic Equatorial::to_ecliptic() const {
-  static const char *fn = "Equatorial::to_ecliptic()";
-
   double lon, lat;
 
   if(!is_valid()) {
-    novas_set_errno(ERANGE, fn, "invalid Equatorial instance");
+    novas_set_errno(ERANGE, "Equatorial::to_ecliptic()", "invalid Equatorial instance");
     return Ecliptic::undefined();
   }
 
@@ -499,10 +497,7 @@ Ecliptic Equatorial::to_ecliptic() const {
 
   equ2ecl(_sys.jd(), _sys.equator_type(), NOVAS_FULL_ACCURACY, r, d, &lon, &lat);
 
-  Ecliptic e(lon * Unit::deg, lat * Unit::deg, _sys);
-  if(!e.is_valid())
-    novas_trace_invalid(fn);
-  return e;
+  return Ecliptic(lon * Unit::deg, lat * Unit::deg, _sys);
 }
 
 /**
@@ -514,10 +509,8 @@ Ecliptic Equatorial::to_ecliptic() const {
  * @sa Galactic::to_equatorial(), to_ecliptic()
  */
 Galactic Equatorial::to_galactic() const {
-  static const char *fn = "Equatorial::to_ecliptic()";
-
   if(!is_valid()) {
-    novas_set_errno(ERANGE, fn, "invalid Equatorial instance");
+    novas_set_errno(ERANGE, "Equatorial::to_ecliptic()", "invalid Equatorial instance");
     return Galactic::undefined();
   }
 
@@ -525,10 +518,7 @@ Galactic Equatorial::to_galactic() const {
   double longitude = 0.0, latitude = 0.0;
   equ2gal(icrs.ra().hours(), icrs.dec().deg(), &longitude, &latitude);
 
-  Galactic g(longitude * Unit::deg, latitude * Unit::deg);
-  if(!g.is_valid())
-    novas_trace_invalid(fn);
-  return g;
+  return Galactic(longitude * Unit::deg, latitude * Unit::deg);
 }
 
 /**

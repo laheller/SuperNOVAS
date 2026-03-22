@@ -19,6 +19,9 @@ int main() {
   GeocentricObserver gc = Observer::at_geocenter();
 
   if(!test.check("invalid", !Frame::undefined().is_valid())) n++;
+  if(!test.check("observer_position(invalid)", !Frame::undefined().observer_position().is_valid())) n++;
+  if(!test.check("observer_velocity(invalid)", !Frame::undefined().observer_velocity().is_valid())) n++;
+
   if(!test.check("invalid observer", !Frame(Observer::undefined(), Time::j2000(), (enum novas_accuracy) -1).is_valid())) n++;
   if(!test.check("invalid time", !Frame(gc, Time::undefined(), (enum novas_accuracy) -1).is_valid())) n++;
   if(!test.check("invalid accuracy", !Frame(gc, Time::j2000(), (enum novas_accuracy) -1).is_valid())) n++;

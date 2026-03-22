@@ -19,6 +19,11 @@ int main() {
   Interval x(NAN);
   if(!test.check("is_valid(NAN)", !x.is_valid())) n++;
   if(!test.check("isnan(NAN)", isnan(x.seconds()))) n++;
+  if(!test.check("to_timescale(NAN)", !x.to_timescale(NOVAS_TT).is_valid())) n++;
+  if(!test.check("NAN.operator*(ScalarVelocity&)", !(x * ScalarVelocity::stationary()).is_valid())) n++;
+  if(!test.check("NAN.operator*(Velocity&)", !(x * Velocity::stationary()).is_valid())) n++;
+  if(!test.check("NAN.operator+()", !(x + Interval::zero()).is_valid())) n++;
+  if(!test.check("NAN.operator-()", !(x - Interval::zero()).is_valid())) n++;
 
   if(!test.check("is_valid(zero)", Interval::zero().is_valid())) n++;
   if(!test.equals("zero()", Interval::zero().minutes(), 0.0)) n++;
@@ -38,6 +43,9 @@ int main() {
   if(!test.equals("julian_centuries()", a.julian_centuries(), Unit::min / Unit::julian_century, 1e-23)) n++;
   if(!test.equals("timescale()", (long) a.timescale(), (long) NOVAS_TT)) n++;
   if(!test.equals("operator - (tt)", (a - a).seconds(), 0.0, 1e-16)) n++;
+  if(!test.check("operator+(NAN)", !(a + x).is_valid())) n++;
+  if(!test.check("operator-(NAN)", !(a - x).is_valid())) n++;
+  if(!test.check("to_timescale(invalid)", !x.to_timescale((enum novas_timescale) -1).is_valid())) n++;
 
   if(!test.equals("inv()", a.inv().minutes(), -1.0)) n++;
 

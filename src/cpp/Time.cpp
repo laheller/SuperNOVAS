@@ -205,7 +205,10 @@ Time::Time(const novas_timespec *t) {
  * @sa oerator+(), shifted()
  */
 Time Time::operator+(double seconds) const {
-  return shifted(seconds);
+  Time t = shifted(seconds);
+  if(!t)
+    novas_trace_invalid("Time::operator+(double)");
+  return t;
 }
 
 /**
@@ -219,7 +222,10 @@ Time Time::operator+(double seconds) const {
  * @sa oerator-(), shifted()
  */
 Time Time::operator+(const Interval& offset) const {
-  return *this + offset.seconds();
+  Time t = *this + offset.seconds();
+  if(!t)
+    novas_trace_invalid("Time::operator+(Interval&)");
+  return t;
 }
 
 /**
@@ -234,7 +240,10 @@ Time Time::operator+(const Interval& offset) const {
  * @sa oerator+(), shifted()
  */
 Time Time::operator-(double seconds) const {
-  return shifted(-seconds);
+  Time t = shifted(-seconds);
+  if(!t)
+    novas_trace_invalid("Time::operator-(double)");
+  return t;
 }
 
 /**
@@ -249,7 +258,10 @@ Time Time::operator-(double seconds) const {
  * @sa operator+(), shifted()
  */
 Time Time::operator-(const Interval& offset) const {
-  return *this - offset.seconds();
+  Time t = *this - offset.seconds();
+  if(!t)
+    novas_trace_invalid("Time::operator-(Interval)");
+  return t;
 }
 
 /**
@@ -263,7 +275,10 @@ Time Time::operator-(const Interval& offset) const {
  * offset_from()
  */
 Interval Time::operator-(const Time& r) const {
-  return offset_from(r);
+  Interval dt = offset_from(r);
+  if(!dt.is_valid())
+    novas_trace_invalid("Time::operator(Time&)");
+  return dt;
 }
 
 /**
@@ -403,7 +418,9 @@ double Time::jd(enum novas_timescale timescale) const {
  */
 long Time::jd_day(enum novas_timescale timescale) const {
   long ijd = 0;
-  novas_get_split_time(&_ts, timescale, &ijd) ;
+  novas_get_split_time(&_ts, timescale, &ijd);
+  if((unsigned) timescale >= NOVAS_TIMESCALES)
+    novas_trace_invalid("Time::jd_day()");
   return ijd;
 }
 
@@ -419,6 +436,8 @@ long Time::jd_day(enum novas_timescale timescale) const {
 long Time::mjd_day(enum novas_timescale timescale) const {
   long ijd = 0;
   double fjd = novas_get_split_time(&_ts, timescale, &ijd);
+  if((unsigned) timescale >= NOVAS_TIMESCALES)
+    novas_trace_invalid("Time::mjd_day()");
   ijd -= 2400000L;
   if(fjd < 0.5) ijd--;
   return ijd;
@@ -434,7 +453,10 @@ long Time::mjd_day(enum novas_timescale timescale) const {
  * @sa mjd_frac(), jd_day(), jd()
  */
 double Time::jd_frac(enum novas_timescale timescale) const {
-  return novas_check_nan("Time::jd_frac()", novas_get_split_time(&_ts, timescale, NULL));
+  double fjd = novas_get_split_time(&_ts, timescale, NULL);
+  if((unsigned) timescale >= NOVAS_TIMESCALES)
+    novas_trace_invalid("Time::jd_frac()");
+  return fjd;
 }
 
 /**
@@ -447,7 +469,9 @@ double Time::jd_frac(enum novas_timescale timescale) const {
  * @sa jd_frac(), mjd_day(), mjd()
  */
 double Time::mjd_frac(enum novas_timescale timescale) const {
-  double f = novas_check_nan("Time::mjd_frac()", jd_frac(timescale));
+  double f = jd_frac(timescale);
+  if((unsigned) timescale >= NOVAS_TIMESCALES)
+    novas_trace_invalid("Time::mjd_frac()");
   return f < 0.5 ? f + 0.5 : f - 0.5;
 }
 
@@ -462,7 +486,9 @@ double Time::mjd_frac(enum novas_timescale timescale) const {
  */
 double Time::mjd(enum novas_timescale timescale) const {
   long ijd = 0;
-  double fjd = novas_check_nan("Time::mjd()", novas_get_split_time(&_ts, timescale, &ijd));
+  double fjd = novas_get_split_time(&_ts, timescale, &ijd);
+  if((unsigned) timescale >= NOVAS_TIMESCALES)
+    novas_trace_invalid("Time::mjd()");
   return (ijd - (int) NOVAS_JD_MJD0) + fjd - 0.5;
 }
 
@@ -640,11 +666,14 @@ Time Time::next_moon_phase(const Angle& phase) const {
  * Returns a string representation (a timestamp) of this time instance.
  *
  * @param timescale   (optional) the timescale in which to represent time (default: UTC).
- * @return            a new string containing the timestamp.
+ * @return            a new string containing the timestamp, or "<invalid time>".
  *
  * @sa to_iso_timestamp(), to_epoch_string()
  */
 std::string Time::to_string(enum novas_timescale timescale) const {
+  if(!is_valid())
+    return "<invalid time>";
+
   char str[40] = {'\0'};
   novas_timestamp(&_ts, timescale, str, sizeof(str));
   return std::string(str);
@@ -653,11 +682,14 @@ std::string Time::to_string(enum novas_timescale timescale) const {
 /**
  * Returns an ISO 8601 timestamp for this time instance.
  *
- * @return            a new string containing the ISO 8601 timestamp.
+ * @return            a new string containing the ISO 8601 timestamp, or "<invalid time>".
  *
  * @sa to_string()
  */
 std::string Time::to_iso_string() const {
+  if(!is_valid())
+    return "<invalid time>";
+
   char str[40] = {'\0'};
   novas_iso_timestamp(&_ts, str, sizeof(str));
   return std::string(str);
@@ -669,9 +701,12 @@ std::string Time::to_iso_string() const {
  * @param decimals    (optional) number of decimal places to show on the year (default: 2).
  *
  * @return        a new string representing the Julian coordinate epoch of this time with the
- *                requested precision.
+ *                requested precision, or "<invalid epoch>"
  */
 std::string Time::to_epoch_string(int decimals) const {
+  if(!is_valid())
+    return "<invalid epoch>";
+
   char fmt[20] = {'\0'}, s[40] = {'\0'};
 
   if(decimals < 0)
@@ -750,10 +785,18 @@ Time Time::now(const EOP& eop) {
  * operator-(), shifted()
  */
 Interval Time::offset_from(const Time& time, enum novas_timescale timescale) const {
-  Interval dt(novas_diff_time_scale(&_ts, &time._ts, timescale));
-  if(!dt.is_valid())
-    novas_trace_invalid("Time::offset_from()");
-  return dt;
+  static const char *fn = "Time::offset_from()";
+
+  if(is_valid() && time.is_valid()) {
+    Interval dt(novas_diff_time_scale(&_ts, &time._ts, timescale));
+    if(!dt.is_valid())
+      novas_trace_invalid(fn);
+    return dt;
+  }
+
+  Interval x = Interval(NAN);
+  novas_trace_invalid(fn);
+  return x;
 }
 
 /**
@@ -770,18 +813,21 @@ Interval Time::offset_from(const Time& time, enum novas_timescale timescale) con
  * @sa oerator+(), offset_from()
  */
 Time Time::shifted(double seconds, enum novas_timescale timescale) const {
+  if(!is_valid() || !isfinite(seconds)) {
+    Time t = Time::undefined();
+    novas_trace_invalid("Time::shifted()");
+    return t;
+  }
+
   long ijd;
   double fjd = novas_get_split_time(&_ts, timescale, &ijd);
   novas_timespec ts1 = {};
 
-  fjd += seconds / Unit::day;;
+  fjd += seconds / Unit::day;
 
   novas_set_split_time(timescale, ijd, fjd, leap_seconds(), dUT1().seconds(), &ts1);
 
-  Time t(&ts1);
-  if(!t.is_valid())
-    novas_trace_invalid("Time::shifted()");
-  return t;
+  return Time(&ts1);
 }
 
 /**

@@ -24,6 +24,9 @@ int main() {
   if(!test.check("is_valid(NAN)", !x.is_valid())) n++;
   if(!test.check("bool(NAN)", !x)) n++;
   if(!test.check("isnan(NAN)", isnan(x.rad()))) n++;
+  if(!test.check("operator+(NAN)", !(x + Angle(10.0 * Unit::deg)).is_valid())) n++;
+  if(!test.check("operator-(NAN)", !(x - Angle(10.0 * Unit::deg)).is_valid())) n++;
+
 
   Angle a(45.0 * Unit::deg);
   if(!test.check("is_valid(45 deg)", a.is_valid())) n++;

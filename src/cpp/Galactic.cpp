@@ -158,11 +158,7 @@ Equatorial Galactic::to_equatorial() const {
 
   double ra = 0.0, dec = 0.0;
   gal2equ(longitude().deg(), latitude().deg(), &ra, &dec);
-
-  Equatorial e(ra * Unit::hour_angle, dec * Unit::deg, Equinox::icrs());
-  if(!e.is_valid())
-    novas_trace_invalid("Galactic::to_equatorial()");
-  return e;
+  return Equatorial(ra * Unit::hour_angle, dec * Unit::deg, Equinox::icrs());
 }
 
 /**

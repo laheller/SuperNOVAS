@@ -46,7 +46,10 @@ Vector::Vector(double x, double y, double z) {
  * @return    a new vector that is the rescaled version of this vector.
  */
 Vector Vector::operator*(double r) const {
-  return scaled(r);
+  Vector v = scaled(r);
+  if(!v.is_valid())
+    novas_trace_invalid("Vector::operator*()");
+  return v;
 }
 
 /**

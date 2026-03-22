@@ -22,8 +22,18 @@ int main() {
   if(!test.check("invalid pos", !x.position().is_valid())) n++;
   if(!test.check("invalid vel", !x.velocity().is_valid())) n++;
   if(!test.equals("invalid system_type()", x.system_type(), -1)) n++;
-  if(!test.check("invalid to_system()", !x.to_icrs().is_valid())) n++;
   if(!test.check("invalid equatorial()", !x.equatorial().is_valid())) n++;
+  if(!test.check("invalid ecliptic()", !x.ecliptic().is_valid())) n++;
+  if(!test.check("invalid galactic()", !x.galactic().is_valid())) n++;
+  if(!test.check("invalid to_system(icrs)", !x.to_system(NOVAS_ICRS).is_valid())) n++;
+  if(!test.check("invalid to_icrs()", !x.to_icrs().is_valid())) n++;
+  if(!test.check("invalid to_j2000()", !x.to_j2000().is_valid())) n++;
+  if(!test.check("invalid to_mod()", !x.to_mod().is_valid())) n++;
+  if(!test.check("invalid to_tod()", !x.to_tod().is_valid())) n++;
+  if(!test.check("invalid to_cirs()", !x.to_cirs().is_valid())) n++;
+  if(!test.check("invalid to_tirs()", !x.to_tirs().is_valid())) n++;
+  if(!test.check("invalid to_itrs()", !x.to_itrs(EOP(32, 0.0, 0.0, 0.0)).is_valid())) n++;
+  if(!test.check("invalid operator>>(icrs)", !(x >> NOVAS_ICRS).is_valid())) n++;
 
   Frame frame = Observer::at_geocenter().reduced_accuracy_frame_at(Time::j2000());
 
@@ -35,6 +45,12 @@ int main() {
   Position pos(1.0 * Unit::pc, 2.0 * Unit::pc, 3.0 * Unit::pc);
   Velocity vel(-1.1 * Unit::km / Unit::s, -2.2 * Unit::km / Unit::s, -3.3 * Unit::km / Unit::s);
 
+  if(!test.check("galactic(invalid pos)", !frame.geometric(Position::undefined(), vel).galactic().is_valid())) n++;
+  if(!test.check("galactic(invalid vel)", frame.geometric(pos, Velocity::undefined()).galactic().is_valid())) n++;
+
+  if(!test.check("to_system(invalid pos)", !frame.geometric(Position::undefined(), vel).to_system(NOVAS_J2000).is_valid())) n++;
+  if(!test.check("to_system(invalid vel)", !frame.geometric(pos, Velocity::undefined()).to_system(NOVAS_J2000).is_valid())) n++;
+
   Geometric a = frame.geometric(pos, vel);
   if(!test.check("is_valid()", a.is_valid())) n++;
   if(!test.check("position()", a.position() == pos)) n++;
@@ -45,10 +61,9 @@ int main() {
   if(!test.check("equatorial()", a.equatorial().xyz(pos.distance()) == pos)) n++;
   if(!test.check("ecliptic()", a.ecliptic() == a.equatorial().to_ecliptic())) n++;
   if(!test.check("galactic()", a.galactic() == a.equatorial().to_galactic())) n++;
+  if(!test.check("to_system(ITRS) invalid", !a.to_system(NOVAS_ITRS).is_valid())) n++;
   if(!test.equals("to_string()", a.to_string(), "Geometric Position (1.000 pc, 2.000 pc, 3.000 pc), Velocity (-1.100 km/s, -2.200 km/s, -3.300 km/s) in Frame for Geocentric Observer at 2000-01-01T11:58:55.816 UTC")) n++;
 
-  if(!test.check("to_system(invalid)", !a.to_system((enum novas_reference_system) -1).is_valid())) n++;
-  if(!test.check("to_system(ITRS) invalid", !a.to_system(NOVAS_ITRS).is_valid())) n++;
 
   Geometric a1 = (a >> NOVAS_ICRS);
   if(!test.equals("operator>>().system_type()", a1.system_type(), NOVAS_ICRS)) n++;

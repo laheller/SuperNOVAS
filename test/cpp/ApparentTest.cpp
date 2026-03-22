@@ -18,9 +18,17 @@ int main() {
   int n = 0;
 
   Apparent x = Apparent::undefined();
-  if(!test.check("invalid", !x.is_valid())) n++;
-  if(!test.check("invalid frame", !x.frame().is_valid())) n++;
-  if(!test.check("invalid to_horizontal()", !x.to_horizontal().is_valid())) n++;
+  if(!test.check("is_valid(invalid)", !x.is_valid())) n++;
+  if(!test.check("frame(invalid)", !x.frame().is_valid())) n++;
+  if(!test.check("to_horizontal(invalid)", !x.to_horizontal().is_valid())) n++;
+  if(!test.check("xyz(invalid)", !x.xyz().is_valid())) n++;
+  if(!test.check("radial_velocity(invalid)", !x.radial_velocity().is_valid())) n++;
+  if(!test.check("distance(invalid)", !x.distance().is_valid())) n++;
+  if(!test.check("equatorial(invalid)", !x.equatorial().is_valid())) n++;
+  if(!test.check("to_cirs(invalid)", !x.to_cirs().is_valid())) n++;
+  if(!test.check("ecliptic(invalid)", !x.ecliptic().is_valid())) n++;
+  if(!test.check("galactic(invalid)", !x.galactic().is_valid())) n++;
+  if(!test.check("astrometric_position(invalid)", !x.astrometric_position().is_valid())) n++;
 
   sky_pos p = {};
   p.ra = 3.0;
@@ -88,9 +96,11 @@ int main() {
 
   sky_pos p1 = p; p1.ra = NAN;
   if(!test.check("invalid p.ra", !Apparent::from_tod_sky_pos(frame, &p1).is_valid())) n++;
+  if(!test.check("to_horizontral(invalid RA)", !x.to_horizontal().is_valid())) n++;
 
   p1 = p; p1.dec = NAN;
   if(!test.check("invalid p.dec", !Apparent::from_tod_sky_pos(frame, &p1).is_valid())) n++;
+  if(!test.check("to_horizontral(invalid Dec)", !x.to_horizontal().is_valid())) n++;
 
   p1 = p; p1.rv = NAN;
   if(!test.check("invalid p.rv", !Apparent::from_tod_sky_pos(frame, &p1).is_valid())) n++;
@@ -113,6 +123,11 @@ int main() {
   if(!test.check("to_horizontal(site)", opt.is_valid())) n++;
   if(!test.equals("to_horizontal() az", opt.azimuth().deg(), az, 1e-13)) n++;
   if(!test.equals("to_horizontal() el", opt.elevation().deg(), el, 1e-13)) n++;
+
+  p.ra = NAN;
+  Apparent xra = Apparent::from_tod_sky_pos(frame, &p);
+  if(!test.check("to_horizontal(invalid RA)", !xra.to_horizontal().is_valid())) n++;
+  if(!test.check("astrometric_position(invalid RA)", !xra.astrometric_position().is_valid())) n++;
 
 
   std::cout << "Apparent.cpp: " << (n > 0 ? "FAILED" : "OK") << "\n";

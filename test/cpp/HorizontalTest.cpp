@@ -24,12 +24,17 @@ int main() {
   if(!test.check("is_valid() invalid", !x.is_valid())) n++;
   if(!test.check("longitude() invalid", isnan(x.longitude().rad()))) n++;
   if(!test.check("latitude() invalid", isnan(x.latitude().rad()))) n++;
+  if(!test.check("zenith_angle() invalid", !x.zenith_angle().is_valid())) n++;
+  if(!test.check("to_refracted() invalid", !x.to_refracted(novas_standard_refraction).is_valid())) n++;
+  if(!test.check("to_unrefracted() invalid", !x.to_unrefracted(novas_standard_refraction).is_valid())) n++;
 
   Horizontal a(-20.0 * Unit::deg, -30.0 * Unit::deg);
   if(!test.check("is_valid()", a.is_valid())) n++;
   if(!test.equals("azimuth()", a.azimuth().deg(), -20.0, 1e-14)) n++;
   if(!test.equals("elevation()", a.elevation().deg(), -30.0, 1e-14)) n++;
   if(!test.equals("zenith_angle()", a.zenith_angle().deg(), 120.0, 1e-13)) n++;
+  if(!test.check("distance_to(invalid)", !a.distance_to(x).is_valid())) n++;
+  if(!test.check("invalid.distance_to()", !x.distance_to(a).is_valid())) n++;
   if(!test.equals("to_string()", a.to_string(), "HOR  -20d 00m 00.000s  -30d 00m 00.000s")) n++;
 
   Site site(15.0 * Unit::deg, -42.0 * Unit::deg, 1.5 * Unit::km);

@@ -16,9 +16,17 @@ int main() {
 
   int n = 0;
 
+  if(!test.check("hours(NAN)", !TimeAngle::hours(NAN).is_valid())) n++;
+  if(!test.check("minutes(NAN)", !TimeAngle::minutes(NAN).is_valid())) n++;
+  if(!test.check("seconds(NAN)", !TimeAngle::seconds(NAN).is_valid())) n++;
+
   TimeAngle x(NAN);
   if(!test.check("is_valid(NAN)", !x.is_valid())) n++;
   if(!test.check("isnan(NAN)", isnan(x.rad()))) n++;
+  if(!test.check("NAN.operator+(TimeAngle&)", !(x + TimeAngle(0.0)).is_valid())) n++;
+  if(!test.check("NAN.operator+(TimeAngle&)", !(x - TimeAngle(0.0)).is_valid())) n++;
+  if(!test.check("NAN.operator+(Interval&)", !(x + Interval::zero()).is_valid())) n++;
+  if(!test.check("NAN.operator+(Interval&)", !(x - Interval::zero()).is_valid())) n++;
 
   TimeAngle a(45.0 * Unit::deg);
   if(!test.check("is_valid(45 deg)", a.is_valid())) n++;
@@ -32,6 +40,11 @@ int main() {
   if(!test.equals("minutes()", a.minutes(), 180.0, 1e-12)) n++;
   if(!test.equals("seconds()", a.seconds(), 3.0 * 3600.0, 1e-10)) n++;
   if(!test.equals("fraction()", a.fraction(), 1.0 / 8.0, 1e-15)) n++;
+  if(!test.check("operator+(TimeAngle NAN)", !(a + x).is_valid())) n++;
+  if(!test.check("operator+(TimeAngle NAN)", !(a - x).is_valid())) n++;
+  if(!test.check("operator+(Interval NAN)", !(a + Interval(NAN)).is_valid())) n++;
+  if(!test.check("operator+(Interval NAN)", !(a - Interval(NAN)).is_valid())) n++;
+
 
   TimeAngle b(30.0 * Unit::deg);
   if(!test.check("operator ==", a == a)) n++;

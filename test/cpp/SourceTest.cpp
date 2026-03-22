@@ -173,15 +173,19 @@ int main() {
 
   Orbital xorb = OrbitalSystem::equatorial().orbit(Time::undefined(), Coordinate(Unit::AU), Angle(-1.0), Interval(Unit::yr));
   if(!test.check("invalid time invalid", !xorb.to_source("xxx").is_valid())) n++;
+  if(!test.check("orbital(invalid time)", !xorb.to_source("xxx").orbital().is_valid())) n++;
 
   xorb = OrbitalSystem::equatorial().orbit(Time::j2000(), Coordinate(NAN), Angle(-1.0), Interval(Unit::yr));
   if(!test.check("invalid major invalid", !xorb.to_source("xxx").is_valid())) n++;
+  if(!test.check("orbital(invalid major)", !xorb.to_source("xxx").orbital().is_valid())) n++;
 
   xorb = OrbitalSystem::equatorial().orbit(Time::j2000(), Coordinate(Unit::AU), Angle(NAN), Interval(Unit::yr));
   if(!test.check("invalid apsis invalid", !xorb.to_source("xxx").is_valid())) n++;
+  if(!test.check("orbital(invalid apsis)", !xorb.to_source("xxx").orbital().is_valid())) n++;
 
   xorb = OrbitalSystem::equatorial().orbit(Time::j2000(), Coordinate(Unit::AU), Angle(-1.0), Interval(NAN));
   if(!test.check("invalid period invalid", !xorb.to_source("xxx").is_valid())) n++;
+  if(!test.check("orbital(invalid period)", !xorb.to_source("xxx").orbital().is_valid())) n++;
 
   Orbital orb = OrbitalSystem::equatorial().orbit(Time::j2000(), Coordinate(Unit::AU), Angle(-1.0), Interval(Unit::yr));
 

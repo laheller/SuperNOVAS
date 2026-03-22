@@ -92,6 +92,29 @@ int main() {
   // ------------------------------------------------------------------------
   test = TestUtil("Orbital");
 
+
+  Orbital x = Orbital(OrbitalSystem::equatorial(), NAN, NAN, NAN, NAN)
+          .eccentricity(NAN, NAN)
+          .apsis_period(NAN)
+          .inclination(NAN, NAN)
+          .node_period(NAN);
+
+  if(!test.check("is_valid(invalid)", !x.is_valid())) n++;
+  if(!test.check("semi_major_axis(invalid)", !x.semi_major_axis().is_valid())) n++;
+  if(!test.check("reference_mean_anomaly(invalid)", !x.reference_mean_anomaly().is_valid())) n++;
+  if(!test.check("period(invalid)", !x.period().is_valid())) n++;
+  if(!test.check("mean_motion(invalid)", isnan(x.mean_motion()))) n++;
+  if(!test.check("periapsis(invalid)", !x.periapsis().is_valid())) n++;
+  if(!test.check("inclination(invalid)", !x.inclination().is_valid())) n++;
+  if(!test.check("ascending_node(invalid)", !x.ascending_node().is_valid())) n++;
+  if(!test.check("pole(invalid)", !x.pole().is_valid())) n++;
+  if(!test.check("apsis_period(invalid)", !x.apsis_period().is_valid())) n++;
+  if(!test.check("apsis_rate(invalid)", isnan(x.apsis_rate()))) n++;
+  if(!test.check("node_period(invalid)", !x.node_period().is_valid())) n++;
+  if(!test.check("node_rate(invalid)", isnan(x.node_rate()))) n++;
+  if(!test.check("position(invalid)", !x.position(Time::j2000()).is_valid())) n++;
+  if(!test.check("velocity(invalid)", !x.velocity(Time::j2000()).is_valid())) n++;
+
   s = (OrbitalSystem::equatorial());
 
   if(!test.check("invalid(system)", !Orbital(xs, Time::j2000(), Coordinate(Unit::AU), Angle(0.0), Interval(Unit::yr)).is_valid())) n++;
@@ -113,6 +136,9 @@ int main() {
   if(!test.equals("mean_motion()", o.mean_motion(), Constant::two_pi / Unit::yr, 1e-14 * o.mean_motion())) n++;
   if(!test.equals("period()", o.period().years(), 1.0, 1e-15)) n++;
   if(!test.equals("to_string()", o.to_string(), "Orbital (a = 1.000 AU, T = 365.242 d, e = 0.000000) in Equatorial OrbitalSystem around SUN inclined at 0.000000 deg with node at 0.000000 deg.")) n++;
+  if(!test.check("position(invalid time)", !x.position(Time::undefined()).is_valid())) n++;
+  if(!test.check("velocity(invalid time)", !x.velocity(Time::undefined()).is_valid())) n++;
+
 
   o = s.orbit(Time::j2000(), Coordinate(Unit::AU), Angle(-1.0), Interval(Unit::yr));
   if(!test.check("is_valid()", o.is_valid())) n++;

@@ -45,6 +45,11 @@ int main() {
   if(!test.equals("day_name() invalid", dx.day_name(), "invalid")) n++;
   if(!test.equals("short_day_name() invalid", dx.short_day_name(), "inv")) n++;
   if(!test.check("to_time() invalid", !dx.to_time(32, 0.0, NOVAS_TT).is_valid())) n++;
+  if(!test.check("operator+() invalid", !(dx + Interval(1.0 * Unit::s)).is_valid())) n++;
+  if(!test.check("operator-(Interval&) invalid", !(dx + Interval(1.0 * Unit::s)).is_valid())) n++;
+  if(!test.check("to_calendar() invalid", !dx.to_calendar(Calendar::gregorian()).is_valid())) n++;
+  if(!test.check("operator>>() invalid", !(dx >> Calendar::gregorian()).is_valid())) n++;
+
 
   if(!test.check("parse_date(J2000)", a.parse_date("2000-01-01 12:00:00").is_valid())) n++;
 
@@ -64,6 +69,10 @@ int main() {
   if(!test.equals("short_day_name()", da.short_day_name(), "Sat")) n++;
   if(!test.equals("to_time(EOP)", da.to_time(EOP(32, 0.0, 0.0, 0.0), NOVAS_TT).jd(), da.jd(), 1e-8)) n++;
   if(!test.equals("to_time()", da.to_time(32, 0.0, NOVAS_TT).jd(), da.jd(), 1e-8)) n++;
+  if(!test.check("operator+(invalid interval)", !(da + Interval(NAN)).is_valid())) n++;
+  if(!test.check("operator-(invalid interval)", !(da - Interval(NAN)).is_valid())) n++;
+  if(!test.check("operator-(invalid date)", !(da - dx).is_valid())) n++;
+  if(!test.check("operator-(CalendarDate&) invalid", !(dx - da).is_valid())) n++;
 
   if(!test.equals("break_down(NULL)", da.break_down(NULL), -1)) n++;
 

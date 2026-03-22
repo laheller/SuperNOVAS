@@ -22,6 +22,12 @@ int main() {
   if(!test.check("x() invalid", isnan(x.x()))) n++;
   if(!test.check("y() invalid", isnan(x.y()))) n++;
   if(!test.check("z() invalid", isnan(x.z()))) n++;
+  if(!test.check("inv() invalid", !x.inv().is_valid())) n++;
+  if(!test.check("speed() invalid", !x.speed().is_valid())) n++;
+  if(!test.check("travel() invalid", !x.travel(Interval::zero()).is_valid())) n++;
+  if(!test.check("operator*() invalid", !(x * Interval::zero()).is_valid())) n++;
+  if(!test.check("invalid.operator+()", !(x + Velocity::stationary()).is_valid())) n++;
+  if(!test.check("invalid.operator-()", !(x - Velocity::stationary()).is_valid())) n++;
 
   if(!test.check("invalid x", !Velocity(NAN, 0.0, 0.0).is_valid())) n++;
   if(!test.check("invalid x", !Velocity(0.0, NAN, 0.0).is_valid())) n++;
@@ -35,6 +41,9 @@ int main() {
   if(!test.equals("y() stationary", z.y(), 0.0)) n++;
   if(!test.equals("z() statiunary", z.z(), 0.0)) n++;
   if(!test.check("is_zero(stationary)", z.is_zero())) n++;
+  if(!test.check("operator+(invalid)", !(z + x).is_valid())) n++;
+  if(!test.check("operator-(invalid)", !(z - x).is_valid())) n++;
+  if(!test.check("travel(invalid interval)", !x.travel(Interval(NAN)).is_valid())) n++;
 
   Velocity a(-1.0 * Unit::km / Unit::s, 2.0 * Unit::km / Unit::s, -3.0 * Unit::km / Unit::s);
   if(!test.check("is_valid(-1 km/s, 2 km/s, -3 km/s)", a.is_valid())) n++;

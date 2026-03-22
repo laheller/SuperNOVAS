@@ -20,8 +20,10 @@ int main() {
   int n = 0;
 
   EOP eop(32.0, 0.1, 0.2, 0.3);
+  Site site(33.0 * Unit::deg, -21.0 * Unit::deg, 3000.0 * Unit::m);
 
   if(!test.check("invalid", !Time::undefined().is_valid())) n++;
+  if(!test.check("invalid", !Time::now(EOP::undefined()).is_valid())) n++;
   if(!test.check("invalid jd = NAN", !Time(NAN, 32, 0.1, NOVAS_UTC).is_valid())) n++;
   if(!test.check("invalid fjd = NAN", !Time((long)NOVAS_JD_J2000, NAN, 32, 0.1, NOVAS_UTC).is_valid())) n++;
   if(!test.check("invalid timescale", !Time(NOVAS_JD_J2000, 32, 0.0, (enum novas_timescale) -1).is_valid())) n++;
@@ -31,6 +33,24 @@ int main() {
   if(!test.check("invalid struct timespec  = NULL", !Time((struct timespec *) NULL, eop).is_valid())) n++;
   if(!test.check("invalid novas_timespec  = NULL", !Time((novas_timespec *) NULL).is_valid())) n++;
   if(!test.check("invalid 'blah'", !Time("blah", eop).is_valid())) n++;
+
+  Time x = Time::undefined();
+  if(!test.check("invalid.operator+()", !(x + Interval(1.0)).is_valid())) n++;
+  if(!test.check("invalid.operator-(Interval&)", !(x - Interval(1.0)).is_valid())) n++;
+  if(!test.check("invalid mjd_frac()", isnan(x.mjd_frac()))) n++;
+  if(!test.check("invalid mjd()", isnan(x.mjd()))) n++;
+  if(!test.check("invalid gst()", !x.gst().is_valid())) n++;
+  if(!test.check("invalid gmst()", !x.gmst().is_valid())) n++;
+  if(!test.check("invalid lst()", !x.lst(site).is_valid())) n++;
+  if(!test.check("invalid era()", !x.era().is_valid())) n++;
+  if(!test.check("invalid time_of_day()", !x.time_of_day().is_valid())) n++;
+  if(!test.check("invalid dUT1()", !x.dUT1().is_valid())) n++;
+  if(!test.equals("invalid day_of_week()", x.day_of_week(), -1)) n++;
+  if(!test.check("invalid moon_phase()", !x.moon_phase().is_valid())) n++;
+  if(!test.check("invalid to_calendar_date()", !x.to_calendar_date().is_valid())) n++;
+  if(!test.equals("invalid to_string()", x.to_string(), "<invalid time>")) n++;
+  if(!test.equals("invalid to_iso_string()", x.to_iso_string(), "<invalid time>")) n++;
+  if(!test.equals("invalid to_epoch_string()", x.to_epoch_string(), "<invalid epoch>")) n++;
 
   Time a((long) NOVAS_JD_J2000, 0.0, eop, NOVAS_UTC);
 
@@ -51,6 +71,16 @@ int main() {
   if(!test.equals("to_epoch_string(-1)", a.to_epoch_string(-1), "J2000")) n++;
   if(!test.equals("to_epoch_string(13)", a.to_epoch_string(13), a.to_epoch_string(12))) n++;
   if(!test.equals("to_calendar_date()", a.to_calendar_date(NOVAS_TT).jd(), a.jd(), 1e-8)) n++;
+  if(!test.check("operator+(invalid interval)", !(a + Interval(NAN)).is_valid())) n++;
+  if(!test.check("operator-(invalid interval)", !(a - Interval(NAN)).is_valid())) n++;
+  if(!test.check("operator-(invalid time)", !(a - x).is_valid())) n++;
+  if(!test.check("invalid.operator-(Time&)", !(x - a).is_valid())) n++;
+
+  if(!test.equals("jd_day(timescale invalid)", !a.jd_day((enum novas_timescale) -1), 0)) n++;
+  if(!test.equals("mjd_day(timescale invalid)", !a.mjd_day((enum novas_timescale) -1), 0)) n++;
+  if(!test.check("jd_frac(timescale invalid)", isnan(a.jd_frac((enum novas_timescale) -1)))) n++;
+  if(!test.check("mjd_frac(timescale invalid)", isnan(a.mjd_frac((enum novas_timescale) -1)))) n++;
+  if(!test.check("mjd(timescale invalid)", isnan(a.mjd((enum novas_timescale) -1)))) n++;
 
   char str[40] = {'\0'};
   novas_iso_timestamp(a._novas_timespec(), str, sizeof(str));
@@ -104,9 +134,7 @@ int main() {
   if(!test.equals("era()", c.era().deg(), era(NOVAS_JD_J2000, -ts.ut1_to_tt), 1-14)) n++;
   if(!test.equals("gmst()", c.gmst().hours(), novas_gmst(NOVAS_JD_J2000, -ts.ut1_to_tt), 1-14)) n++;
   if(!test.equals("gst()", c.gst().hours(), novas_gast(NOVAS_JD_J2000 - ts.ut1_to_tt, ts.ut1_to_tt, NOVAS_FULL_ACCURACY), 1-14)) n++;
-
-  Site site(33.0 * Unit::deg, -21.0 * Unit::deg, 3000.0 * Unit::m);
-  if(!test.equals("gst()", c.lst(site).hours(), novas_time_lst(c._novas_timespec(), site.longitude().deg(), NOVAS_FULL_ACCURACY), 1-14)) n++;
+  if(!test.equals("lst()", c.lst(site).hours(), novas_time_lst(c._novas_timespec(), site.longitude().deg(), NOVAS_FULL_ACCURACY), 1-14)) n++;
 
   if(!test.check("from_mjd(NAN)", !Time::from_mjd(NAN, eop).is_valid())) n++;
 

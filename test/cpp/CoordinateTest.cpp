@@ -19,6 +19,8 @@ int main() {
   Coordinate x(NAN);
   if(!test.check("is_valid(NAN)", !x.is_valid())) n++;
   if(!test.check("isnan(NAN)", isnan(x.m()))) n++;
+  if(!test.check("abs(NAN)", !x.abs().is_valid())) n++;
+  if(!test.check("parallax(NAN)", !x.parallax().is_valid())) n++;
 
   if(!test.check("is_valid(at_Gpc())", Coordinate::at_Gpc().is_valid())) n++;
   if(!test.equals("at_Gpc()", Coordinate::at_Gpc().m(), Unit::Gpc, 1e-15)) n++;

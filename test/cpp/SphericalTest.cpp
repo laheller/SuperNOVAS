@@ -20,6 +20,11 @@ int main() {
   if(!test.check("invalid lat", !Spherical(45.0 * Unit::deg, NAN).is_valid())) n++;
   if(!test.check("invalid lat > 90", !Spherical(45.0 * Unit::deg, 91.0 * Unit::deg).is_valid())) n++;
 
+  Spherical x(NAN, NAN);
+  if(!test.check("is_valid() invalid", !x.is_valid())) n++;
+  if(!test.check("xyz() invalid", !x.xyz(Coordinate(Unit::Gpc)).is_valid())) n++;
+
+
   Spherical a(45.0 * Unit::deg, 30.0 * Unit::deg);
   if(!test.check("is_valid()", a.is_valid())) n++;
   if(!test.equals("longitude()", a.longitude().deg(), 45.0, 1e-14)) n++;

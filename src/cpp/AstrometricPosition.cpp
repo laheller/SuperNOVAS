@@ -177,7 +177,7 @@ AstrometricPosition AstrometricPosition::referenced_to_ssb() const {
  * @return            a string summary of this referenced position.
  */
 std::string AstrometricPosition::to_string(int decimals) const {
-  return Position::to_string(decimals) + " at " + _emit_time.to_string() + " from " + _obs_pos.to_string();
+  return Position::to_string(decimals) + " at " + _emit_time.to_string() + " from SSB " + _obs_pos.to_string();
 }
 
 

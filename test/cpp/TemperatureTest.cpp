@@ -20,6 +20,7 @@ int main() {
   if(!test.check("is_valid(NAN)", !x.is_valid())) n++;
   if(!test.check("isnan(NAN)", isnan(x.celsius()))) n++;
   if(!test.check("!is_valid(-1 K)", !Temperature::kelvin(-1.0).is_valid())) n++;
+  if(!test.check("is_valid(-1000 F)", !Temperature::farenheit(-1000.0).is_valid())) n++;
 
   Temperature a = Temperature::celsius(45.0);
   if(!test.check("is_valid(45 C)", a.is_valid())) n++;
