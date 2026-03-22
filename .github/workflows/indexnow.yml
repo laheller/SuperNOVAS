@@ -18,6 +18,5 @@ jobs:
         with:
           sitemap-location: 'https://sigmyne.github.io/SuperNOVAS/sitemap.xml'
           key: ${{ secrets.INDEXNOW_KEY }}
-          key-location: 'https://sigmyne.github.io/SuperNOVAS/${{ secrets.INDEXNOW_KEY }}.txt'
           limit: 200
 
