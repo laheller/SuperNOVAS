@@ -227,7 +227,7 @@ Coordinate Apparent::distance() const {
  * Returns the apparent equatorial coordinates on the sky, with respect to the true equator and
  * equinox of date (True-of-Date; TOD).
  *
- * @return    the apparent equatorial coordinates in the system in which they were defined.
+ * @return    True-of-date (TOD) equatorial coordinates.
  *
  * @sa cirs(), ecliptic(), galactic(), to_horizontal()
  */
@@ -239,10 +239,11 @@ Equatorial Apparent::equatorial() const {
 }
 
 /**
- * Returns the apparent equatorial coordinates on the sky, in the coordinate system in the Celestial
- * Intermediate Reference System (CIRS).
+ * Returns the apparent equatorial coordinates on the sky, in the Celestial Intermediate Reference
+ * System (CIRS). CIRS is defined on the true equator of date, but its origin is the Celestial
+ * Intermediate Origin (CIO), not the true equinox of date.
  *
- * @return    the apparent equatorial coordinates in the system in which they were defined.
+ * @return    the CIRS equatorial coordinates.
  *
  * @sa equatorial(), ecliptic(), galactic(), to_horizontal()
  */
