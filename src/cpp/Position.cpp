@@ -115,6 +115,22 @@ Position Position::operator-(const Position& r) const {
 }
 
 /**
+ * Returns the velocity vector that is equal to this position vector travelled under the specified
+ * time interval.
+ *
+ * @param dt   the time interval on the right-hand-side of '/'.
+ * @return     velocity <b>v</b> = <b>x</b> / dt, where <b>x</b> is this position vector.
+ *
+ * @sa Position::operator/()
+ */
+Velocity Position::operator/(const Interval& dt) const {
+  Velocity v(_component[0] / dt.seconds(), _component[1] / dt.seconds(), _component[2] / dt.seconds());
+  if(!v.is_valid())
+    novas_trace_invalid("Position::operator/()");
+  return v;
+}
+
+/**
  * Returns the distance to the location indicated by this position (that is the absolute value of
  * this position vector).
  *

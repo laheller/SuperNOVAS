@@ -95,12 +95,9 @@ distclean: clean
 	@$(MAKE) -s -C examples distclean
 	@$(MAKE) -s -C doc distclean
 
-.PHONY: dox
-dox:
-	DOXYGEN_HTML_HEADER="resources/header.html" $(MAKE) -C doc
 
-.PHONY: local-dox
-local-dox:
+.PHONY: dox local-dox
+dox local-dox:
 	$(MAKE) -C doc
 
 
@@ -251,7 +248,7 @@ help:
 	@echo "  static        Builds the static 'lib/libsupernovas[++].a' libraries."
 	@echo "  shared        Builds the shared 'libsupernovas[++].so', 'libsolsys1.so', and" 
 	@echo "                'libsolsys2.so' libraries (linked to versioned ones)."
-	@echo "  local-dox     Compiles local HTML API documentation using 'doxygen'."
+	@echo "  dox           Compiles HTML API documentation using 'doxygen'."
 	@echo "  test          Runs regression tests."
 	@echo "  benchmark     Runs benchmarks."
 	@echo "  analyze       Performs static code analysis with 'cppcheck'."

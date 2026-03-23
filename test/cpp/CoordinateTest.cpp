@@ -21,6 +21,7 @@ int main() {
   if(!test.check("isnan(NAN)", isnan(x.m()))) n++;
   if(!test.check("abs(NAN)", !x.abs().is_valid())) n++;
   if(!test.check("parallax(NAN)", !x.parallax().is_valid())) n++;
+  if(!test.check("NAN.operator/()", !(x / Interval(2.0)).is_valid())) n++;
 
   if(!test.check("is_valid(at_Gpc())", Coordinate::at_Gpc().is_valid())) n++;
   if(!test.equals("at_Gpc()", Coordinate::at_Gpc().m(), Unit::Gpc, 1e-15)) n++;
@@ -36,6 +37,9 @@ int main() {
   if(!test.equals("kpc()", a.kpc(), Unit::au / Unit::kpc, 1e-23)) n++;
   if(!test.equals("Mpc()", a.Mpc(), Unit::au / Unit::Mpc, 1e-26)) n++;
   if(!test.equals("Gpc()", a.Gpc(), Unit::au / Unit::Gpc, 1e-29)) n++;
+  if(!test.equals("operator/()", (a / Interval(100.0 * Unit::day)).au_per_day(),
+          ScalarVelocity(0.01 * Unit::AU / Unit::day).au_per_day(), 1e-12 * Unit::AU / Unit::day)) n++;
+  if(!test.check("operator/(0.0)", !(a / Interval::zero()).is_valid())) n++;
 
   Coordinate b(1.0 * Unit::pc);
   if(!test.equals("pc(1 pc)", b.pc(), 1.0)) n++;

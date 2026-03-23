@@ -44,6 +44,8 @@ Vector::Vector(double x, double y, double z) {
  *
  * @param r   scaling factor on the right-hand side
  * @return    a new vector that is the rescaled version of this vector.
+ *
+ * @sa operator/()
  */
 Vector Vector::operator*(double r) const {
   Vector v = scaled(r);

@@ -66,7 +66,7 @@ int main() {
   ScalarVelocity c = ScalarVelocity::from_redshift(0.1);
   if(!test.equals("from_redshift()", c.km_per_s(), novas_z2v(0.1) , 1e-11)) n++;
 
-  ScalarVelocity d = ScalarVelocity(Coordinate(90.0 * Unit::km), Interval(2.0 * Unit::sec));
+  ScalarVelocity d = Coordinate(90.0 * Unit::km) / Interval(2.0 * Unit::sec);
   if(!test.equals("from_redshift()", d.km_per_s(), 45.0, 1e-14)) n++;
 
   if(!test.equals("to_string()", a.to_string(), "45.000 km/s")) n++;

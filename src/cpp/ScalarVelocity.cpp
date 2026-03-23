@@ -34,17 +34,6 @@ ScalarVelocity::ScalarVelocity(double m_per_s) : _ms(m_per_s) {
 }
 
 /**
- * Instantiates a (signed) scalar velocity (speed) given the distance travelled in the specified
- * time interval.
- *
- * @param d     distance travelled
- * @param time  time interval
- *
- * @sa from_redshift()
- */
-ScalarVelocity::ScalarVelocity(const Coordinate& d, const Interval& time) : _ms(d.m() / time.seconds()) {}
-
-/**
  * Returns the signed scalar sum of this speed and the specified other speed, using the
  * relativistic formula for addition.
  *

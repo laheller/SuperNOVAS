@@ -24,6 +24,7 @@ int main() {
   if(!test.check("operator+() invalid", !(x + Position::origin()).is_valid())) n++;
   if(!test.check("operator-() invalid", !(x - Position::origin()).is_valid())) n++;
   if(!test.check("inv() invalid", !x.inv().is_valid())) n++;
+  if(!test.check("operator/() invalid", !(x / Interval(2.0)).is_valid())) n++;
 
   Position z = Position::origin();
   if(!test.check("is_valid() origin", z.is_valid())) n++;
@@ -46,6 +47,9 @@ int main() {
   if(!test.check("is_zero()", !a.is_zero())) n++;
   if(!test.equals("distance()", a.distance().au(), sqrt(14.0), 1e-14)) n++;
   if(!test.equals("to_string()", a.to_string(), "Position (-1.000 AU, 2.000 AU, -3.000 AU)")) n++;
+  if(!test.check("operator/(Interval&)", (a / Interval(Unit::yr)) ==
+          Velocity(-1.0 * Unit::au / Unit::yr, 2.0 * Unit::au / Unit::yr, -3.0 * Unit::au / Unit::yr))) n++;
+  if(!test.check("operator/(interval 0)", !(a / Interval::zero()).is_valid())) n++;
 
   Frame frame = Observer::at_geocenter().reduced_accuracy_frame_at(Time::j2000());
 

@@ -48,6 +48,22 @@ Coordinate Coordinate::abs() const {
 }
 
 /**
+ * Returns the scalar velocity that is equal to this coordinate travelled under the specified time
+ * interval.
+ *
+ * @param dt   the time interval on the right-hand-side of '/'.
+ * @return     scalar velocity v = x / dt, where x is this coordinate.
+ *
+ * @sa Position::operator/()
+ */
+ScalarVelocity Coordinate::operator/(const Interval& dt) const {
+  ScalarVelocity v(_meters / dt.seconds());
+  if(!v.is_valid())
+    novas_trace_invalid("Coordinate::operator/()");
+  return v;
+}
+
+/**
  * Returns the distance in meters.
  *
  * @return    [m] the distance in meters.

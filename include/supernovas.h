@@ -374,6 +374,8 @@ public:
 
   Coordinate abs() const;
 
+  ScalarVelocity operator/(const Interval& dt) const;
+
   double m() const;
 
   double km() const;
@@ -594,7 +596,7 @@ public:
 
   virtual ~Vector() {}; // something virtual to make class polymorphic for dynamic casting.
 
-  Vector operator*(double factor) const;
+  Vector operator*(double r) const;
 
   double x() const;
 
@@ -698,6 +700,8 @@ public:
 
   Position operator-(const Position &r) const;
 
+  Velocity operator/(const Interval& dt) const;
+
   Coordinate distance() const;
 
   Position inv() const;
@@ -728,8 +732,6 @@ private:
 
 public:
   explicit ScalarVelocity(double m_per_s);
-
-  ScalarVelocity(const Coordinate& d, const Interval& time);
 
   ScalarVelocity operator+(const ScalarVelocity& r) const;
 
