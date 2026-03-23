@@ -253,7 +253,7 @@ Position Site::itrs_to_enu(const Position& p) const {
 /**
  * Converts an ITRF velocity vector to a local East-Noth-Up (ENU) vector at the site.
  *
- * @param p   _xyz_ velocity vector in ITRF.
+ * @param v   _xyz_ velocity vector in ITRF.
  * @return    the same vector in East-North-Up (ENU) directions at the site.
  *
  * @sa enu_to_itrf()
@@ -287,7 +287,7 @@ Position Site::enu_to_itrs(const Position& p) const {
 /**
  * Converts an East-Noth-Up (ENU) velocity vector at the site to an ITRF vector.
  *
- * @param p   velocity vector in East-North-Up (ENU) directions at the site.
+ * @param v   velocity vector in East-North-Up (ENU) directions at the site.
  * @return    the same position vector in ITRF.
  *
  * @sa itrf_to_enu()

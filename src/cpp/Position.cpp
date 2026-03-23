@@ -202,7 +202,7 @@ std::string Position::to_string(int decimals) const {
 /**
  * Returns a reference to a statically defined standard invalid position vector. This invalid
  * vector may be used inside any object that is invalid itself.
- *`
+ *
  * @return    a reference to the static standard invalid vector.
  */
 const Position& Position::undefined() {
