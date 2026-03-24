@@ -12,7 +12,6 @@
 #include "supernovas.h"
 
 
-
 namespace supernovas {
 
 /**
@@ -302,7 +301,7 @@ Velocity Site::enu_to_itrs(const Velocity& v) const {
 }
 
 /**
- * Returns the geocentric position of this site in rectangular coordinates.
+ * Returns the geocentric position of this site in ITRS rectangular coordinates.
  *
  * @return  a new position with the geocentric rectangular coordinates of the site.
  */

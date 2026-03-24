@@ -1354,6 +1354,14 @@ public:
 
   Velocity enu_velocity() const;
 
+  Position geocentric_position_at(const Time& time, enum novas_reference_system system = NOVAS_TOD) const;
+
+  Velocity geocentric_velocity_at(const Time& time, enum novas_reference_system system = NOVAS_TOD) const;
+
+  Position uvw(const Time& time, const Equatorial& geocentric, const Coordinate& distance = Coordinate::at_Gpc()) const;
+
+  Interval geometric_delay_for(const Time& time, const Equatorial& geocentric, const Coordinate& distance = Coordinate::at_Gpc()) const;
+
   const EOP& eop() const;
 
   std::string to_string() const override;
@@ -2483,6 +2491,10 @@ class AstrometricPosition : public Position {
     AstrometricPosition referenced_to(const Position& ssb_pos) const;
 
     AstrometricPosition referenced_to_ssb() const;
+
+    Position uvw(const Equatorial& phase_center, const Coordinate& distance = Coordinate::at_Gpc()) const;
+
+    Interval geometric_delay_for(const Equatorial& phase_center, const Coordinate& distance = Coordinate::at_Gpc()) const;
 
     std::string to_string(int decimals = 3) const override;
 };
