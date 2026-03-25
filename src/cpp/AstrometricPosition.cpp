@@ -173,9 +173,17 @@ AstrometricPosition AstrometricPosition::referenced_to_ssb() const {
  * astrometric position. That is, it returns the _u_,_v_,_w_ coordinates of this astrometric place
  * (of a station), measured relative to the reference point (array reference location), for a
  * given apparent line-of-sight on the sky (source) at the time as when the station location is
- * defined. The _u_ and _v_ coordinates are the orthogonal projections of the site in the
- * direction of the local East and North respectively, as seen from the source, relative to the
- * array reference, while _w_ is the distance from the array reference along the line of sight.
+ * defined. The _u_ and _v_ coordinates are the orthogonal projections of the site, relative to
+ * the array reference, in the direction of the local East and North respectively, as seen from
+ * the source; while _w_ is the distance from the array reference along the line of sight.
+ *
+ * You could also use `Observer::to_interferometric()` instead. However, using relative astrometric
+ * positions can overcome numerical precision issues for interferometers located far from the
+ * geocenter or the SSB, such as at L2. Specifically, `Observer::to_interferometric()` uses absolute
+ * geocentric and SSB station positions, and interferometric baselines are obtained from differencing
+ * these with the reference position used in defining the phase center direction. In contrast,
+ * astrometric positions are always defined as relative positions from the array reference, and
+ * will be more accurate, in general.
  *
  * ```cpp
  *  // The momentary position of a station relative to the array reference
@@ -191,20 +199,21 @@ AstrometricPosition AstrometricPosition::referenced_to_ssb() const {
  *  Interval& dt = uvw.geometric_delay();
  * ```
  *
- * For ground-based interferometric application, see `GeodeticObserver::interferometric()`
+ * For ground-based interferometric application, see `GeodeticObserver::to_interferometric()`
  * instead.
  *
  * @param phase_center      %Apparent equatorial coordinates of the interferometric phase center,
- *                          as seen from the array reference position.
- * @param distance          (optional) %Apparent distance to phase center at the time of
- *                          observation (default: 1 Gpc).
+ *                          as seen from the array reference position, at the time at which
+ *                          this position is defined.
+ * @param distance          (optional) %Apparent distance to phase center, from the array
+ *                          reference, at the time of observation (default: 1 Gpc).
  * @param relative_motion   (optional station's velocity vector relative to the reference position
  *                          (default: stationary).
  *
- * @return            interferometric uvw coordinates for this astrometric place viewed from the
- *                    direction of the source at the specified time.
+ * @return            interferometric _uvw_ projection this astrometric place viewed from the
+ *                    direction of the source at the time for which this position was defined.
  *
- * @sa GeodeticObserver::interferometric()
+ * @sa Observer::to_interferometric()
  */
 Interferometric AstrometricPosition::to_interferometric(const Equatorial& phase_center, const Coordinate& distance, const Velocity& relative_motion) const {
   Equinox system = Equinox::from_system_type(_ref_sys, obs_time().jd());

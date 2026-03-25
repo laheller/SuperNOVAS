@@ -422,7 +422,28 @@ std::string CatalogSource::to_string() const {
           " " + Angle(c->dec * Unit::deg).to_string() + " " + _cat.system().to_string();
 }
 
+/**
+ * Returns the ephemeris position and velocity of this Solar-system source, in the ICRS, and
+ * relative to the Solar System Barycenter (SSB), or else an undefined position if no
+ * ephemeris lookup is possible.
+ *
+ * @param time        The astrometric time
+ * @param accuracy    (optional) NOVAS_FULL_ACCURACY (default), or NOVAS_REDUCED_ACCURACY.
+ * @return            The SSB-based geometric position and velocity of this source at the
+ *                    specified time, as obtained from ephemeris lookup; or else an undefiled
+ *                    (invalid) object if the lookup failed.
+ */
+Geometric SolarSystemSource::geometric_at(const Time& time, enum novas_accuracy accuracy) const {
+  const double tdb[2] = { time.jd(NOVAS_TDB), 0.0 };
+  double p[3] = {0.0}, v[3] = {0.0};
 
+  if(ephemeris(tdb, Planet::earth()._novas_object(), NOVAS_BARYCENTER, accuracy, p, v) != 0) {
+    novas_trace_invalid("Planet::ephemeris_position_at()");
+    return Geometric::undefined();
+  }
+
+  return Geometric(Observer::at_ssb().frame_at(time, accuracy), Position(p, Unit::AU), Velocity(v, Unit::AU / Unit::day), NOVAS_ICRS);
+}
 
 
 /**

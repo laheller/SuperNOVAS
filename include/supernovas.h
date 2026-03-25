@@ -724,11 +724,11 @@ public:
 
 /**
  * _u_, _v_, _w_ projections of an interferometric station along a line of sight. The _u_ and _v_
- * coordinates are the orthogonal projections of the station in the direction of the local East
- * and North, as seen from the source, relative to the array reference, while _w_ is the distance
+ * coordinates are the orthogonal projections of the station, relative to the array reference, in the
+ * direction of the local East and North, as seen from the source; while _w_ is the distance
  * from the array reference location along the line of sight.
  *
- * @sa GeodeticObserver::interferometric(), AstrometricPosition::interferometric()
+ * @sa Observer::to_interferometric(), AstrometricPosition::to_interferometric()
  *
  * @ingroup interferometry
  */
@@ -1324,6 +1324,8 @@ protected:
   explicit Observer(enum novas_observer_place type, const Site& site = Site::undefined(), const Position& pos = Position::origin(),
           const Velocity& vel = Velocity::stationary());
 
+  virtual Geometric geocentric_at(const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const;
+
 public:
 
   virtual ~Observer() {}
@@ -1343,6 +1345,9 @@ public:
 
   /// @ingroup frame
   Frame reduced_accuracy_frame_at(const Time& time) const;
+
+  /// @ingroup interferometry
+  Interferometric to_interferometric(const Apparent& phase_center) const;
 
   virtual std::string to_string() const;
 
@@ -1398,12 +1403,7 @@ public:
 
   Velocity enu_velocity() const;
 
-  Position geocentric_position_at(const Time& time, enum novas_reference_system system = NOVAS_TOD) const;
-
-  Velocity geocentric_velocity_at(const Time& time, enum novas_reference_system system = NOVAS_TOD) const;
-
-  /// @ingroup interferometry
-  Interferometric interferometric(const Apparent& geocentric, const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const;
+  Geometric geocentric_at(const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const override;
 
   const EOP& eop() const;
 
@@ -1418,18 +1418,21 @@ public:
  * @ingroup observer
  */
 class GeocentricObserver : public Observer {
+protected:
+  Geometric geocentric_at(const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const override;
+
 public:
   GeocentricObserver();
 
   GeocentricObserver(const Position& pos, const Velocity& vel);
 
-  const Observer *copy() const override;
-
-  bool is_geocentric() const override;
-
   Position geocentric_position() const;
 
   Velocity geocentric_velocity() const;
+
+  const Observer *copy() const override;
+
+  bool is_geocentric() const override;
 
   std::string to_string() const override;
 };
@@ -1441,6 +1444,9 @@ public:
  * @ingroup observer
  */
 class SolarSystemObserver : public Observer {
+protected:
+  Geometric geocentric_at(const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const override;
+
 public:
 
   SolarSystemObserver();
@@ -1970,7 +1976,8 @@ protected:
 
 public:
 
-  Geometric geometric_at(const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const; // TODO
+  /// @ingroup geometric
+  Geometric geometric_at(const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const;
 
   Coordinate helio_distance(const Time& time) const;
 

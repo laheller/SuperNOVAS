@@ -1128,6 +1128,16 @@ int novas_uvw(const double *restrict station_pos, const double *restrict station
  * is typically interested in _uvw_ coordinates relative to the reference position, which can be
  * obtained from the geocentric _uvw_ provided by this method, via simple vector differencing.
  *
+ * NOTES:
+ *
+ * - This method supports down to nanometer precision for sites on Earth or in Low Earth Orbit
+ *   (LEO), and sub-micron (&lt;&mu;m) precision even at the distance of the Moon. However,
+ *   because its calculations are based on geocentric positions, the precision degrades with
+ *   increasing distance from Earth, and may not be suitable for interferometers far from Earth.
+ *   When precision is a concern, you might use the more generic `novas_uvw()` instead, with
+ *   positions (and velocities) of the stations defined relative to the array center -- enabling
+ *   higher precision projections than this function.
+ *
  * @param ts                  Astrometric time of observation.
  * @param station             Interferometric station site.
  * @param geocentric_source   [AU] %Apparent true-of-date (TOD) position of a source, as seen from
