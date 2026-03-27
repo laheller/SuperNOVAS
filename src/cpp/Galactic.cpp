@@ -58,6 +58,7 @@ Galactic::Galactic(const Angle& longitude, const Angle& latitude)
  *                    degrees.
  *
  * @sa novas_str_degrees() for details on string representation that can be parsed.
+ * @sa novas_parse_degrees() for more managed parsing from strings.
  */
 Galactic::Galactic(const std::string& longitude, const std::string& latitude)
 : Galactic(Angle(longitude), Angle(latitude)) {}

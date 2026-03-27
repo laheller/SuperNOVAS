@@ -66,6 +66,7 @@ Spherical::Spherical(const Angle& longitude, const Angle& latitude)
  *                    degrees.
  *
  * @sa novas_str_degrees() for details on string representation that can be parsed.
+ * @sa novas_parse_degrees() for more managed parsing from strings.
  */
 Spherical::Spherical(const std::string& lon, const std::string& lat)
 : Spherical(Angle(lon), Angle(lat)) {}

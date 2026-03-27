@@ -160,6 +160,8 @@ CalendarDate Calendar::date(const struct timespec *ts) const {
  *              string date could not be parsed.
  *
  * @sa CalendarDate::to_string(), date()
+ * @sa novas_parse_date(), novas_parse_ido_date(), novas_parse_date_format() for more managed
+ *     parsing from strings.
  */
 CalendarDate Calendar::parse_date(const std::string& str, enum novas_date_format fmt) const {
   double jd = novas_parse_date_format(_type, fmt, str.c_str(), NULL);

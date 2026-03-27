@@ -61,6 +61,7 @@ Horizontal::Horizontal(const Angle& azimuth, const Angle& elevation)
  *                    degrees.
  *
  * @sa novas_str_degrees() for details on string representation that can be parsed.
+ * @sa novas_parse_degrees() for more managed parsing from strings.
  */
 Horizontal::Horizontal(const std::string& azimuth, const std::string& elevation)
 : Horizontal(Angle(azimuth), Angle(elevation)) {}

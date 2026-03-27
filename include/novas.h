@@ -116,12 +116,13 @@
 /**
  * \defgroup source           Astronomical object of interest
  *
- *   Defining the astronomical source of interest, or accessing properties thereof. Source may be
- *   sidereal catalog sources, such as as star, molecular cloud or a distant galaxy, or else they
- *   may be Solar-system objects, such as planets, moons, asteroids, comets or near-Earth objects
- *   (NEOs). Thet may have positions and velocities provided through ephemeris data (such as the
- *   NASA JPL planetary on other ephemeris files), or else via orbital models (such as published
- *   by the IAU Minor Planet Center [MPC]).
+ *   Defining the astronomical source of interest, or accessing properties thereof. A source may
+ *   be a sidereal catalog source, such as as star, molecular cloud or a distant galaxy, or else
+ *   it may be a Solar-system body, such as planets, moons, asteroids, comets or near-Earth
+ *   objects (NEOs). Solar-system sources may have positions and velocities provided through
+ *   ephemeris data (such as the NASA JPL planetary on other ephemeris files), or else via orbital
+ *   models (such as published by the
+ *   [IAU Minor Planet Center](https://www.minorplanetcenter.net/) [MPC]).
  *
  * \defgroup observer         Observer location
  *
@@ -134,15 +135,15 @@
  *
  * \defgroup time             Time of observation and astronomical timescales
  *
- *   Defining the precise time of observation, and support for all relevant astrobomical
+ *   Defining the precise time of observation, and support for all relevant astronomical
  *   timescales, such as UT1, UTC, TAI, GPS, TT, TDB, TCG, TCB.
  *
  * \defgroup frame            Observing frames
  *
  *   Observing frames are a combination of an observer place, and an specific time of observation.
  *
- *   SuperNOVAS _observing frames_ are not to be confused with _coordinate reference frames_, even
- *   if the two do have aspects in common. Here, a frame provides a topological snapshot of
+ *   __SuperNOVAS__ _observing frames_ are not to be confused with _coordinate reference frames_,
+ *   even if the two do have aspects in common. Here, a frame provides a topological snapshot of
  *   apparent places of all sources on the sky, as well as their geometric locations and
  *   velocities in 3D space -- without imposing a particular coordinate system on them. So, while
  *   a _coordinate reference frame_ (such as ICRF) implies a particular choice of a coordinate
@@ -156,14 +157,15 @@
  * \defgroup apparent         Apparent equatorial positions on sky
  *
  *   %Apparent places, defined on the local sky of an observer. They are mainly a direction on the
- *   (e.g. R.A./Dec) on the sky, from the observer's point of view. Unlike geometric locations,
- *   apparent positions are corrected for aberration for the observer's relative movement, and for
- *   gravitational deflection around the major gravitating solar-system bodies as light transits
- *   the Solar-system from the source to the observer.
+ *   (e.g. R.A./Dec) on the sky and a spectroscopic radial velocity measure, from the observer's
+ *   point of view. Unlike geometric locations, apparent positions are corrected for aberration
+ *   for the observer's relative movement, and for gravitational deflection around the major
+ *   gravitating solar-system bodies as light transits the Solar-system from the source to the
+ *   observer.
  *
  * \defgroup geometric        Geometric equatorial positions and velocities
  *
- *   Geometric locations are 3D positions and velocities relative on an observer location. They
+ *   Geometric locations are 3D positions and velocities relative to an observer location. They
  *   are corrected for light travel time to the observer, so they reflect the position of sources
  *   either for when light originated from the source (for Solar-system bodies), or for when light
  *   reaches the Solar-system barycenter (for sidereal sources).
@@ -180,19 +182,36 @@
  *
  * \defgroup refract          Atmospheric refraction
  *
- *   Accounting for atmopheric refraction for observers on or above Earth's surface. SuperNOVAS
- *   provides various atmopsheric refraction models. Some use the specified weather parameters,
- *   while others use a standard weather for the observer location. Some models are wavelength
- *   dependent, so user's can (should) specify a observing wavelength when using them.
+ *   Accounting for atmopheric refraction for observers on or above Earth's surface.
+ *   __SuperNOVAS__ provides various atmopsheric refraction models. Some use the specified weather
+ *   parameters, while others use a standard weather for the observer location. Some models are
+ *   wavelength dependent, so user's can (should) specify a observing wavelength when using them.
  *
  * \defgroup spectral         Spectroscopic applications
  *
- *   Calculating precice spectroscopic radial velocity measures or redshifts.
+ *   Calculating precise spectroscopic radial velocity measures or redshifts. When defining
+ *   catalog (that is non-Solar-system) sources __SuperNOVAS__ allows you to specify spectroscopic
+ *   velocity measures, either as a Solar-system Barycentric radial velocity, or relative to the
+ *   Local Standard of Rest (LSR), or as a redshift measure (_z_). And, when you calculate
+ *   apparent places in an observing frame, __SuperNOVAS__ will use that information (or the
+ *   geometric velocity vecotr obtained for Solar-system bodies), to calculate the precise
+ *   spectroscopic radial velocity that the observer would measure, using the appropriate
+ *   relativistic formulae to account for both the kinetic and gravitational effects, including
+ *   projection effects due to gravitational bending.
+ *
+ *   The spectroscopic measure of velocity (_v_<sub>r</sub>) or redshift (_z_) is one that relates the
+ *   wavelength of the observed light (&lambda;<sub>obs</sub>) to that of the emitted light
+ *   (&lambda;<sub>rest</sub>):
+ *
+ *   &lambda;<sub>obs</sub> / &lambda;<sub>rest</sub> = 1 + _z_ = [(1 + _v_<sub>r</sub> / _c_) / (1 - _v_<sub>r</sub> / _c_)]<sup>1/2</sup>,
+ *
+ *   where _c_ is the speed of light.
+ *
  *
  * \defgroup solar-system     Solar-system ephemeris providers
  *
- *   Defining how ephemeris positions for Solar-system objects are provided. SuperNOVAS does not
- *   have a integral way for handling Solar-system ephemerides. By default it can calculate
+ *   Defining how ephemeris positions for Solar-system objects are provided. __SuperNOVAS__ does
+ *   not have a integral way for handling Solar-system ephemerides. By default it can calculate
  *   approximate positions / velocities for the Sun and Earth only. Thus, to enable proper
  *   calculations involving Solar-system bodies you must interface to libraries like CALCEPH or
  *   CSPICE, or else to externally provided plugin functions.
@@ -203,22 +222,26 @@
  *   precession-nutation models) polar motion and rotational variations of the physical Earth.
  *   %EOP are necessary to transform between pseudo Earth-fixed (e.g. the Terrestrial Intermediate
  *   Reference System [TIRS]) and the Earth-fixed International Terrestrial Reference System
- *   (ITRS). IERS publishes daily Earth orientation parameters, in various ITRF realizations.
- *   For the utmost accuracy (below the mas-level), these must be further corrected for diurnal
- *   variations caused by librarion and the oceans tides.
+ *   (ITRS). They are essential for precise calculations for Earth-based observers.
+ *
+ *   IERS publishes daily [Earth orientation data](https://www.iers.org/IERS/EN/DataProducts/EarthOrientationData/eop),
+ *   in various ITRF realizations. For the utmost accuracy (below the mas-level), these must be
+ *   further corrected for diurnal variations caused by librarion and the oceans tides, which is
+ *   something that __SuperNOVAS__ does automatically when defining astrometric time or an
+ *   observing frame with the interpolated published EOP values.
  *
  * \defgroup tracking         Telescope tracking
  *
  *   Tools for supporting telescope tracking, with readily available position, rate of movement,
  *   and acceleration of the source's trajectory on sky. These parameters may be used directly
  *   for controlling telescope drive systems. Tracking parameters can be obtained for both
- *   %Equatorial and horizontal mounts. Apart from direct control of telescope drives, tracking
+ *   equatorial and horizontal mounts. Apart from direct control of telescope drives, tracking
  *   information can also be used to calculate interpolated positions on sky on short timescales
  *   much faster than through full-fledged positional calculations.
  *
  * \defgroup util             Helpers and utilities
  *
- *   Various helpers tools and utilities of the SuperNOVAS library.
+ *   Various helpers tools and utilities of the __SuperNOVAS__ library.
  */
 
 
@@ -453,13 +476,13 @@
 /// @c_source
 #define NOVAS_SYSTEM_FK6           "FK6"
 
-/// The Hipparcos dataset coordinate system as a string
+/// The Hipparcos dataset coordinate system as a string.
 /// @since 1.3
 /// @sa novas_set_catalog(), make_cat_object_sys()
 /// @c_source
 #define NOVAS_SYSTEM_HIP           "HIP"
 
-/// [&mu;m] Default wavelength, e.g. for wavelength-dependent refraction models. It is set to the
+/// [&mu;m] Default wavelength, for wavelength-dependent refraction models. It is set to the
 /// median wavelength of visible light.
 /// @since 1.4
 /// @sa novas_refract_wavelength()
@@ -697,8 +720,8 @@ enum novas_planet {
         3.0893e-9, 9.1338e-12, 2.120483e-6, 3.1397e-11, 0.0, 0.0 }
 
 /**
- * Default set of gravitating bodies to use for deflection calculations in reduced accuracy mode.
- * (only apply gravitational deflection for the Sun.)
+ * Bitwise mask defining a sefault set of gravitating bodies to use for deflection calculations in
+ * reduced accuracy mode. (only apply gravitational deflection for the Sun.)
  *
  * @since 1.1
  * @author Attila Kovacs
@@ -709,7 +732,8 @@ enum novas_planet {
 #define DEFAULT_GRAV_BODIES_REDUCED_ACCURACY   ( (1 << NOVAS_SUN) )
 
 /**
- * Default set of gravitating bodies to use for deflection calculations in full accuracy mode.
+ * Bitwise mask defining a default set of gravitating bodies to use for deflection calculations in
+ * full accuracy mode.
  *
  * @since 1.1
  * @author Attila Kovacs

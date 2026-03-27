@@ -79,6 +79,7 @@ Equatorial::Equatorial(const Angle& ra, const Angle& dec, const Equinox &system)
  *                    coordinates are specified (default: ICRS)
  *
  * @sa novas_str_hours(), novas_str_degrees() for details on string representation that can be parsed.
+ * @sa novas_parse_hours(), novas_parse_degrees() for more managed parsing from strings.
  */
 Equatorial::Equatorial(const std::string& ra, const std::string& dec, const Equinox &system)
 : Equatorial(TimeAngle(ra), Angle(dec), system) {

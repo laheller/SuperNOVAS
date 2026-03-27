@@ -80,6 +80,7 @@ Ecliptic::Ecliptic(const Angle& longitude, const Angle& latitude, const Equinox 
  *                    ICRS).
  *
  * @sa novas_str_degrees() for details on string representation that can be parsed.
+ * @sa novas_parse_degrees() for more managed parsing from strings.
  */
 Ecliptic::Ecliptic(const std::string& longitude, const std::string& latitude, const Equinox& system)
 : Ecliptic(Angle(longitude), Angle(latitude), system) {}

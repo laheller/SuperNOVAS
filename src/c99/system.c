@@ -743,10 +743,10 @@ int equ2hor(double jd_ut1, double ut1_to_tt, enum novas_accuracy accuracy, doubl
 }
 
 /**
- * Converts a 3D line-of-sight vector (&delta;&phi;, &delta;&theta; &delta;r) to a rectangular
+ * Converts a 3D line-of-sight vector (&delta;&phi;, &delta;&theta;, &delta;r) to a rectangular
  * equatorial (&delta;x, &delta;y, &delta;z) vector.
  *
- * @param los         [arb.u.] Line-of-sight 3-vector (&delta;&phi;, &delta;&theta; &delta;r).
+ * @param los         [arb.u.] Line-of-sight 3-vector (&delta;&phi;, &delta;&theta;, &delta;r).
  * @param lon         [deg] Line-of-sight longitude.
  * @param lat         [deg] Line-of-sight latitude.
  * @param[out] xyz    [arb.u.] Output rectangular equatorial 3-vector (&delta;x, &delta;y, &delta;z),
@@ -798,12 +798,12 @@ int novas_los_to_xyz(const double *los, double lon, double lat, double *xyz) {
 
 /**
  * Converts a 3D rectangular equatorial (&delta;x, &delta;y, &delta;z) vector to a polar
- * (&delta;&phi;, &delta;&theta; &delta;r) vector along a line-of-sight.
+ * (&delta;&phi;, &delta;&theta;, &delta;r) vector along a line-of-sight.
  *
  * @param xyz         [arb.u.] Rectangular equatorial 3-vector (&delta;x, &delta;y, &delta;z).
  * @param lon         [deg] Line-of-sight longitude.
  * @param lat         [deg] Line-of-sight latitude.
- * @param[out] los    [arb.u.] Output line-of-sight 3-vector (&delta;&phi;, &delta;&theta;
+ * @param[out] los    [arb.u.] Output line-of-sight 3-vector (&delta;&phi;, &delta;&theta;,
  *                    &delta;r), in the same units as the input. It may be the same vector as the
  *                    input.
  * @return            0 if successful, or else -1 if either vector argument is NULL (errno will be

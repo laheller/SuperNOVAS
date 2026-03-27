@@ -19,7 +19,7 @@
 extern "C" {
 
 #ifndef _CONSTS_
-#  define _CONSTS_                              ///< Don't use the old NOVAS constants with names like C, AU
+#  define _CONSTS_                              ///< Block using the old NOVAS constants with names like C, AU
 #endif
 
 #define _EXCLUDE_DEPRECATED                     ///< Let go of any deprecated C99 functions
@@ -746,6 +746,8 @@ public:
 
   bool operator!=(const ScalarVelocity& speed) const;
 
+  Coordinate operator*(const Interval& time) const;
+
   /**
    * Returns the magnitude of this speed, as a unsigned speed.
    *
@@ -768,8 +770,6 @@ public:
   Coordinate travel(double seconds) const;
 
   Coordinate travel(const Interval& time) const;
-
-  Coordinate operator*(const Interval& time) const;
 
   Velocity in_direction(const Vector& direction) const;
 
@@ -1145,7 +1145,7 @@ public:
  * methods to convert both the EOP and/or the Site to another ITRF realization, if need be.</li>
  * </ol>
  *
- * @sa Time, GeodeticObserver, Apparent::to_itrs(), Geometric::to_itrs(), Horizontal::to_apparent()
+ * @sa Time, GeodeticObserver, Geometric::to_itrs(), Horizontal::to_apparent()
  * \ingroup earth
  */
 class EOP : public Validating {

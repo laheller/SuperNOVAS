@@ -111,10 +111,13 @@ Time::Time(long ijd, double fjd, const EOP& eop, enum novas_timescale timescale)
  *
  * @param timestamp     A precision timestamp, such as an ISO 8601 timestamp.
  * @param leap_seconds  [s] leap seconds, that is TAI - UTC (default: 0)
- * @param dUT1          [s] UT1 - UTC time difference, e.g. from the IERS Bulletins or service (default: 0.0).
+ * @param dUT1          [s] UT1 - UTC time difference, e.g. from the IERS Bulletins or service
+ *                      (default: 0.0).
  * @param timescale     (optional) Astronomical timescale (default: TT).
  *
  * @sa now(), from_mjd(), j2000(), b1950(), b1900(), hip()
+ * @sa novas_parse_date(), novas_parse_ido_date(), novas_parse_date_format(),
+ *     novas_parse_timescale() for more managed parsing from strings.
  */
 Time::Time(const std::string& timestamp, int leap_seconds, double dUT1, enum novas_timescale timescale) {
   if(novas_set_str_time(timescale, timestamp.c_str(), leap_seconds, dUT1, &_ts) != 0)
@@ -131,6 +134,8 @@ Time::Time(const std::string& timestamp, int leap_seconds, double dUT1, enum nov
  * @param timescale     (optional) Astronomical timescale (default: TT).
  *
  * @sa now(), from_mjd(), j2000(), b1950(), b1900(), hip()
+ * @sa novas_parse_date(), novas_parse_ido_date(), novas_parse_date_format(),
+ *     novas_parse_timescale() for more managed parsing from strings.
  */
 Time::Time(const std::string& timestamp, const EOP& eop, enum novas_timescale timescale)
 : Time(timestamp, eop.leap_seconds(), eop.dUT1().seconds(), timescale) {}
