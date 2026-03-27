@@ -77,7 +77,7 @@ jobs:
       FORTIFY: 3
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Build static C++ library
         run: make static-cpp
