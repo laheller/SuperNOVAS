@@ -521,14 +521,16 @@ int novas_make_frame(enum novas_accuracy accuracy, const observer *obs, const no
   long ijd_ut1;
   double fjd_ut1;
 
+  if(!frame)
+    return novas_error(-1, EINVAL, fn, "NULL output frame");
+
+  frame->state = 0;
+
   if(accuracy < 0 || accuracy > NOVAS_REDUCED_ACCURACY)
     return novas_error(-1, EINVAL, fn, "invalid accuracy: %d", accuracy);
 
   if(!obs || !time)
     return novas_error(-1, EINVAL, fn, "NULL input parameter: obs=%p, time=%p", obs, time);
-
-  if(!frame)
-    return novas_error(-1, EINVAL, fn, "NULL output frame");
 
   if((unsigned) obs->where >= NOVAS_OBSERVER_PLACES)
     return novas_error(-1, EINVAL, fn, "invalid observer location: %d", obs->where);

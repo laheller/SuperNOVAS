@@ -746,12 +746,24 @@ short geo_posvel(double jd_tt, double ut1_to_tt, enum novas_accuracy accuracy, c
       // Other two cases: Get geocentric position and velocity vectors of
       // observer wrt equator and equinox of date.
 
-    case NOVAS_OBSERVER_ON_EARTH: {                     // Observer on surface of Earth.
+    case NOVAS_OBSERVER_ON_EARTH:
+    case NOVAS_AIRBORNE_OBSERVER: {                     // Observer on surface of Earth.
+      const double kms = DAY / AU_KM;
+
       // Compute UT1 and sidereal time.
       double jd_ut1 = jd_tt - (ut1_to_tt / DAY);
 
+
       // Function 'terra' does the hard work, given sidereal time.
       terra(&obs->on_surf, novas_gast(jd_ut1, ut1_to_tt, accuracy), pos1, vel1);
+
+      if(obs->where == NOVAS_AIRBORNE_OBSERVER) {
+        int i;
+        // Add in the aircraft motion
+        for(i = 0; i < 3; i++)
+          vel1[i] = novas_add_vel(vel1[i], obs->near_earth.sc_vel[i] * kms);
+      }
+
       break;
     }
 
@@ -764,23 +776,6 @@ short geo_posvel(double jd_tt, double ut1_to_tt, enum novas_accuracy accuracy, c
         pos1[i] = obs->near_earth.sc_pos[i] / AU_KM;
         vel1[i] = obs->near_earth.sc_vel[i] * kms;
       }
-
-      break;
-    }
-
-    case NOVAS_AIRBORNE_OBSERVER: {                     // Airborne observer
-      const double kms = DAY / AU_KM;
-      observer surf = *obs;
-      int i;
-
-      surf.where = NOVAS_OBSERVER_ON_EARTH;
-
-      // Get the stationary observer velocity at the location
-      prop_error(fn, geo_posvel(jd_tt, ut1_to_tt, accuracy, &surf, pos1, vel1), 0);
-
-      // Add in the aircraft motion
-      for(i = 3; --i >= 0;)
-        vel1[i] = novas_add_vel(vel1[i], obs->near_earth.sc_vel[i] * kms);
 
       break;
     }

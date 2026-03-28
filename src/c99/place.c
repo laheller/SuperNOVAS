@@ -128,7 +128,8 @@
  * @param location      The observer location, relative to which the output positions and velocities
  *                      are to be calculated
  * @param ut1_to_tt     [s] TT - UT1 time difference. Used only when 'location->where' is
- *                      NOVAS_OBSERVER_ON_EARTH (1) or NOVAS_OBSERVER_IN_EARTH_ORBIT (2).
+ *                      NOVAS_OBSERVER_ON_EARTH (1) or NOVAS_OBSERVER_IN_EARTH_ORBIT (2), or
+ *                      NOVAS_AIRBORNE_OBSERVER (3).
  * @param coord_sys     The coordinate system that defines the orientation of the celestial pole.
  *                      If it is NOVAS_ICRS (3), a geometric position and radial velocity is returned. For
  *                      all other systems, the returned position is the apparent position including

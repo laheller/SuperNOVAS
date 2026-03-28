@@ -60,11 +60,12 @@
  *
  * @param where         The location type of the observer
  * @param loc_surface   Pointer to data structure that defines a location on Earth's surface.
- *                      Used only if 'where' is NOVAS_OBSERVER_ON_EARTH, otherwise can be
- *                      NULL.
+ *                      Used only if 'where' is NOVAS_OBSERVER_ON_EARTH or
+ *                      NOVAS_AIRBORNE_OBSERVER. Otherwise, it can be NULL.
  * @param loc_space     Pointer to data structure that defines a near-Earth location in space.
- *                      Used only if 'where' is NOVAS_OBSERVER_IN_EARTH_ORBIT, otherwise can
- *                      be NULL.
+ *                      Used only if 'where' is NOVAS_OBSERVER_IN_EARTH_ORBIT,
+ *                      NOVAS_AIRBORNE_OBSERVER, or NOVAS_SOLAR_SYSTEM_OBSERVER. Otherwise, it
+ *                      can be NULL.
  * @param[out] obs      Pointer to observer data structure to populate.
  * @return              0 if successful, -1 if a required argument is NULL, or 1 if the 'where'
  *                      argument is invalid.
@@ -208,6 +209,7 @@ int make_observer_at_site(const on_surface *restrict site, observer *restrict ob
   if(!obs)
     return novas_error(-1, EINVAL, fn, "output observer is NULL");
 
+  memset(obs, 0, sizeof(observer));
   obs->where = NOVAS_OBSERVER_ON_EARTH;
   obs->on_surf = *site;
 
@@ -640,7 +642,8 @@ int aberration(const double *pos, const double *vobs, double lighttime, double *
  *
  * @param jd_tdb        [day] Barycentric Dynamical Time (TDB) based Julian date.
  * @param ut1_to_tt     [s] TT - UT1 time difference. Used only when 'location->where' is
- *                      NOVAS_OBSERVER_ON_EARTH (1) or NOVAS_OBSERVER_IN_EARTH_ORBIT (2).
+ *                      NOVAS_OBSERVER_ON_EARTH (1) or NOVAS_OBSERVER_IN_EARTH_ORBIT (2), or
+ *                      NOVAS_AIRBORNE_OBSERVER (3).
  * @param accuracy      NOVAS_FULL_ACCURACY (0) or NOVAS_REDUCED_ACCURACY (1)
  * @param obs           The observer location, relative to which the output positions and
  *                      velocities are to be calculated
