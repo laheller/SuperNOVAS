@@ -38,6 +38,7 @@ set(EXAMPLE_PROGRAMS
     example-high-z
     example-orbital
     example-rise-set
+    example-moon
 )
 
 if(supernovas_solsys-calceph_FOUND)
