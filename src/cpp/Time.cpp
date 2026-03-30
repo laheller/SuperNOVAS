@@ -771,10 +771,12 @@ Time Time::from_mjd(double mjd, const EOP& eop, enum novas_timescale timescale) 
  * @sa Time(), from_mjd(), j2000(), b1950(), b1900(), hip()
  */
 Time Time::now(const EOP& eop) {
-  if(!eop.is_valid())
-    novas_set_errno(EINVAL, "Time::now()", "input EOP is invalid");
-  Time time = Time();
-  novas_set_current_time(eop.leap_seconds(), eop.dUT1().seconds(), &time._ts);
+  novas_timespec ts = {};
+  novas_set_current_time(eop.leap_seconds(), eop.dUT1().seconds(), &ts);
+
+  Time time = Time(&ts);
+  if(!time.is_valid())
+    novas_trace_invalid("Time::now()");
   return time;
 }
 

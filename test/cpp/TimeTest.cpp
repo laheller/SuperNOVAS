@@ -150,8 +150,10 @@ int main() {
 
   timespec_get(&tu, TIME_UTC);
   Time e = Time::now(eop);
+  if(!test.check("now()", e.is_valid())) n++;
+
   tu1.tv_sec = e.unix_time(&tu1.tv_nsec);
-  if(!test.equals("now()", (tu1.tv_sec + 1e-9 * tu1.tv_nsec), (tu.tv_sec + 1e-9 * tu.tv_nsec), 0.1)) n++;
+  if(!test.equals("now() time", (tu1.tv_sec + 1e-9 * tu1.tv_nsec), (tu.tv_sec + 1e-9 * tu.tv_nsec), 0.1)) n++;
 
   std::cout << "Time.cpp: " << (n > 0 ? "FAILED" : "OK") << "\n";
   return n;
