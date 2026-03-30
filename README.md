@@ -9,10 +9,7 @@
 
 # SuperNOVAS
 
-<a href="https://doi.org/10.5281/zenodo.14584983">
-  <img src="resources/748170057.svg" alt="Zenodo DOI badge" align="left"/>
-</a>
-<br clear="all">
+[![DOI](https://sigmyne.github.io/SuperNOVAS/resources/748170057.svg)]("https://doi.org/10.5281/zenodo.14584983)
 
 The NOVAS C astrometry library, made better.
 
