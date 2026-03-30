@@ -1702,6 +1702,10 @@ private:
 public:
   Frame(const Observer& obs, const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY);
 
+  ~Frame() {
+    delete _observer;
+  }
+
   const novas_frame* _novas_frame() const;
 
   const Observer& observer() const;
