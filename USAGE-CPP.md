@@ -131,7 +131,7 @@ It is generally a good idea to check for validity whenever getting sane numerica
 if you are not entirely sure. For example:
 
 ```cpp
-  Observer obs = ...  // Define an observer location
+  Observer obs = ...;  // Define an observer location
   if(!obs.is_valid()) {
     // Oops, something isn't right...
     return;
@@ -141,7 +141,7 @@ if you are not entirely sure. For example:
 or, equivalently the objects themselves can be evaluated as boolean types, the same as calling `is_valid()`, i.e.:
 
 ```cpp
-  Observer obs = ...  // Define an observer location
+  Observer obs = ...;  // Define an observer location
   if(!obs) {
     // Oops, something isn't right...
     return;
@@ -167,10 +167,10 @@ with the implicit copy-assignment operator -- but not when the variable was decl
   const Frame frame = ...;
 ```
 
-To make the __SuperNOVAS__ classes more thread-safe, they are designed never to store references to external objects 
-internally. Instead, they always store copies of the parameters that were supplied by their constructors or update 
-methods. While the explit copying may result in a small overhead, it also means that the objects referenced internally 
-cannot vanish or change unexpectedly.
+To further support thread safety, the __SuperNOVAS__ classes are designed never to store references to external 
+objects internally. Instead, they always store copies of the parameters that were supplied by their constructors or 
+update methods. While the copying may result in a small overhead, it guarantess that the internal data cannot vanish 
+or change unexpectedly.
 
 
 <a name="operators-cpp"></a>
@@ -185,7 +185,7 @@ velocities the addition and subtraction follows the relativistic formulae, e.g. 
  Velocity dv = v2 - v1;  // Relativistic difference of two velocity vectors.
 ```
 
-You can also add or subtract intervals around `Time` instances, for `Time t`, you might define: 
+You can also add or subtract intervals around `Time` instances, such as for `Time t` you might define: 
 
 ```cpp
  Time t1 = t + 1.1 * Unit::min;  // offset time (in the same timescale)
@@ -329,7 +329,7 @@ deg E, 60m elevation:
 
 ```cpp
  // Specify the location we are observing from, e.g. a GPS / WGS84 location
- Site site = Site::from_GPS(50.7374 * Unit::deg, 7.0982 * Unit::deg, 60.0 * Unit::m);
+ Site site = Site::from_GPS(7.0982 * Unit::deg, 50.7374 * Unit::deg, 60.0 * Unit::m);
 ```
 
 > [!TIP]
@@ -339,7 +339,7 @@ deg E, 60m elevation:
 Again you could have specified the coordinates as DMS strings, or as `supernovas::Angle` objects also, e.g.:
 
 ```cpp
- Site site = Site::from_GPS("50.7374N", "7.0982 deg E", Coordinate(60.0 * Unit::m));
+ Site site = Site::from_GPS("7.0982 deg E", "50.7374N", Coordinate(60.0 * Unit::m));
 ```
 
 Next, you will want to create an `supernovas::Observer` instance for that location with the appropriate Earth 
