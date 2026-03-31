@@ -60,10 +60,9 @@ int main() {
   if(!test.equals("y() inv", ai.y(), -a.y())) n++;
   if(!test.equals("z() inv", ai.z(), -a.z())) n++;
 
-  const double *pa = a._array();
-  if(!test.equals("_array()[0]", pa[0], -1.0 * Unit::km / Unit::s)) n++;
-  if(!test.equals("_array()[1]", pa[1], 2.0 * Unit::km / Unit::s)) n++;
-  if(!test.equals("_array()[2]", pa[2], -3.0 * Unit::km / Unit::s)) n++;
+  if(!test.equals("[0]", a[0], -1.0 * Unit::km / Unit::s)) n++;
+  if(!test.equals("[1]", a[1], 2.0 * Unit::km / Unit::s)) n++;
+  if(!test.equals("[2]", a[2], -3.0 * Unit::km / Unit::s)) n++;
 
   double p[3] = {-1.0, 2.0, -3.0};
   Velocity b(p, Unit::km / Unit::s);

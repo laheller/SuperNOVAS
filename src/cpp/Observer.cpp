@@ -29,8 +29,8 @@ Observer::Observer(enum novas_observer_place type, const Site& site, const Posit
   double vUnit = (type == NOVAS_SOLAR_SYSTEM_OBSERVER) ? Unit::AU / Unit::day : Unit::km / Unit::s;
 
   for(int i = 0; i < 3; i++) {
-    _observer.near_earth.sc_pos[i] = pos._array()[i] / pUnit;
-    _observer.near_earth.sc_vel[i] = vel._array()[i] / vUnit;
+    _observer.near_earth.sc_pos[i] = pos[i] / pUnit;
+    _observer.near_earth.sc_vel[i] = vel[i] / vUnit;
   }
 };
 

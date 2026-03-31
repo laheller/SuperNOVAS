@@ -87,29 +87,30 @@ class   EquatorialTrack;
  * distance (i.e. meters) as:
  *
  * ```c
- *   double d = 2.4103 * Unit::au;
+ *   double d = 2.4103 * Unit::AU;
  * ```
+ *
+ * Note, this class cannot be instantiated or copied. You should only use its static fields.
  *
  * @sa Constant
  * @ingroup util
  */
 class Unit {
 private:
-  // Private Constructor
+  /// Private Constructor
   Unit() {}
-
-  //Unit(Unit const&);            // Don't Implement
-  void operator=(Unit const&);    // Don't implement
 
 public:
   /// \cond PRIVATE
-  // Deleting the copy constructor to prevent copies
-  Unit(const Unit& obj) = delete;
-  //Unit(Unit const&)     = delete;
+  /// Delete the copy constructor to prevent copies
+  Unit(const Unit& other) = delete;
+
+  /// Delete the copy assignment operator
+  Unit& operator=(const Unit& other) = delete;
   /// \endcond
 
   static constexpr double AU = NOVAS_AU;                  /// [m] 1 Astronomical Unit in meters.
-  static constexpr double au = AU;                        /// [m] 1 AU (lowe-case)
+  static constexpr double au = AU;                        /// [m] 1 AU (lower-case)
   static constexpr double m = 1.0;                        /// [m] 1 meter (standard unit of distance)
   static constexpr double cm = 0.01;                      /// [m] 1 centimeter in meters
   static constexpr double mm = 1e-3;                      /// [m] 1 millimeter in meters
@@ -172,22 +173,25 @@ public:
  *   double beta = (29.5 * Unit::km / Unit::sec) / Constant::c;
  * ```
  *
+ * Note, this class cannot be instantiated or copied. You should only use its static fields.
+ *
  * @sa Unit
  * @ingroup util
  */
 class Constant {
 private:
-  // Private Constructor
+  /// Private Constructor
   Constant() {}
 
-  //Constant(Constant const&);        // Don't Implement
   void operator=(Constant const&);    // Don't implement
 
 public:
   /// \cond PRIVATE
-  // Deleting the copy constructor to prevent copies
-  Constant(const Constant& obj) = delete;
-  //Constant(Constant const&)     = delete;
+  /// Delete the copy constructor to prevent copies
+  Constant(const Constant& other) = delete;
+
+  /// Delete the copy assignment operator also
+  Constant& operator=(const Constant other) = delete;
   /// \endcond
 
   static constexpr double pi = M_PI;                    /// [rad] &pi;
@@ -414,7 +418,6 @@ public:
  */
 class Interval : public Validating {
 private:
-
   double _seconds;                      ///< [s] stored time of the interval
   enum novas_timescale _scale;   ///< store timescale of the interval
 
@@ -599,6 +602,8 @@ public:
 
   Vector operator*(double r) const;
 
+  double operator[](int idx) const;
+
   double x() const;
 
   double y() const;
@@ -747,6 +752,8 @@ public:
   bool operator!=(const ScalarVelocity& speed) const;
 
   Coordinate operator*(const Interval& time) const;
+
+  ScalarVelocity operator[](int idx) const;
 
   /**
    * Returns the magnitude of this speed, as a unsigned speed.

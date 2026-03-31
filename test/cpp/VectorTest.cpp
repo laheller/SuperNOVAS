@@ -28,6 +28,12 @@ int main() {
   if(!test.equals("operator*()", (a * 10).to_string(3), "VEC (-11.23, 21.23, -31.23)")) n++;
   if(!test.equals("operator*()", (10 * a).to_string(3), "VEC (-11.23, 21.23, -31.23)")) n++;
 
+  if(!test.equals("[0]", a[0], -1.123456789, 1e-15)) n++;
+  if(!test.equals("[1]", a[1], 2.123456789, 1e-15)) n++;
+  if(!test.equals("[2]", a[2], -3.123456789, 1e-15)) n++;
+  if(!test.check("[-1]", isnan(a[-1]))) n++;
+  if(!test.check("[3]", isnan(a[3]))) n++;
+
   std::cout << "Vector.cpp: " << (n > 0 ? "FAILED" : "OK") << "\n";
   return n;
 }

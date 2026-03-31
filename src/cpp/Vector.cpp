@@ -15,11 +15,7 @@
 
 namespace supernovas {
 
-Vector::Vector() {
-  _component[0] = NAN;
-  _component[1] = NAN;
-  _component[2] = NAN;
-}
+Vector::Vector() : _component{NAN, NAN, NAN} {}
 
 /**
  * Instantiates a vector from its cartesian components.
@@ -28,11 +24,7 @@ Vector::Vector() {
  * @param y   [arb.u.] _y_ component
  * @param z   [arb.u.] _z_ component
  */
-Vector::Vector(double x, double y, double z) {
-  _component[0] = x;
-  _component[1] = y;
-  _component[2] = z;
-
+Vector::Vector(double x, double y, double z) : _component{x, y, z} {
   if(!isfinite(abs()))
     novas_set_errno(EINVAL, "Vector()", "input has NAN or infinite component(s)");
   else
@@ -86,6 +78,22 @@ double Vector::y() const {
 double Vector::z() const {
   return _component[2];
 }
+
+/**
+ * Returns the component at the specified index.
+ *
+ * @param idx   [0:2] The 0-based coordinate index.
+ * @return      The component value at that index, or else NAN if the index is out of the [0:2]
+ *              (errno will be set to ERANGE).
+ */
+double Vector::operator[](int idx) const {
+  if(idx < 0 || idx >= 3) {
+    novas_set_errno(ERANGE, "Position::operator[]", "index %d is out of range [0:2]", idx);
+    return NAN;
+  }
+  return _component[idx];
+}
+
 
 /**
  * Checks if this verctor is a null vector, that is all of its components are zero.
