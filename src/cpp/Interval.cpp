@@ -15,11 +15,11 @@
 
 namespace supernovas {
 
-static Interval from_tt(double x, enum novas_timescale timescale) {
+static double from_tt(double x, enum novas_timescale timescale) {
   switch(timescale) {
-    case NOVAS_TCB: return Interval(x * (1.0 + Constant::L_B), timescale);
-    case NOVAS_TCG: return Interval(x * (1.0 + Constant::L_G), timescale);
-    default: return Interval(x, timescale);
+    case NOVAS_TCB: return x * (1.0 + Constant::L_B);
+    case NOVAS_TCG: return x * (1.0 + Constant::L_G);
+    default: return x;
   }
 }
 
@@ -88,10 +88,10 @@ Position Interval::operator*(const Velocity& v) const {
  * @sa operator-()
  */
 Interval Interval::operator+(const Interval& r) const {
-  Interval dt = from_tt(tt_seconds(*this) + tt_seconds(r), timescale());
-  if(!dt.is_valid())
+  double dt = from_tt(tt_seconds(*this) + tt_seconds(r), _scale);
+  if(!isfinite(dt))
     novas_trace_invalid("Interval::operator+()");
-  return dt;
+  return Interval(dt, _scale);
 }
 
 /**
@@ -104,10 +104,10 @@ Interval Interval::operator+(const Interval& r) const {
  * @sa operator+()
  */
 Interval Interval::operator-(const Interval& r) const {
-  Interval dt = from_tt(tt_seconds(*this) - tt_seconds(r), timescale());
-  if(!dt.is_valid())
+  double dt = from_tt(tt_seconds(*this) - tt_seconds(r), _scale);
+  if(!isfinite(dt))
     novas_trace_invalid("Interval::operator-()");
-  return dt;
+  return Interval(dt, _scale);
 }
 
 /**
@@ -285,10 +285,10 @@ double Interval::julian_centuries() const {
  * @return        the equivalent time interval in the specified timescale
  */
 Interval Interval::to_timescale(enum novas_timescale scale) const {
-  Interval dt = from_tt(tt_seconds(*this), scale);
-  if(!dt.is_valid())
+  double dt = from_tt(tt_seconds(*this), scale);
+  if(!isfinite(dt))
     novas_trace_invalid("Interval::to_timescale()");
-  return dt;
+  return Interval(dt, scale);
 }
 
 /**
