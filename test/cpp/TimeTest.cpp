@@ -66,7 +66,7 @@ int main() {
   if(!test.equals("time_of_day(UTC)", a.time_of_day(NOVAS_UTC).hours(), 12.0, 1e-7)) n++;
   if(!test.equals("day_of_week(UTC)", a.day_of_week(NOVAS_UTC), novas_day_of_week(a.jd(NOVAS_UTC)), 1e-7)) n++;
   if(!test.equals("moon_phase()", a.moon_phase().deg(), novas_moon_phase(a.jd(NOVAS_TDB)), 1e-9)) n++;
-  if(!test.equals("next_moon_phase()", a.next_moon_phase(Angle(90.0 * Unit::deg)).jd(NOVAS_TDB), novas_next_moon_phase(a.jd(NOVAS_TDB), 90.0), 1e-9)) n++;
+  if(!test.equals("next_moon_phase()", a.next_moon_phase(Angle(90.0 * Unit::deg)).jd(NOVAS_TDB), novas_next_moon_phase(90.0, a.jd(NOVAS_TDB)), 1e-9)) n++;
   if(!test.equals("to_epoch_string(3)", a.to_epoch_string(3), "J2000.000")) n++;
   if(!test.equals("to_epoch_string(-1)", a.to_epoch_string(-1), "J2000")) n++;
   if(!test.equals("to_epoch_string(13)", a.to_epoch_string(13), a.to_epoch_string(12))) n++;

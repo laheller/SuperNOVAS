@@ -661,7 +661,7 @@ Angle Time::moon_phase() const {
  * @sa moon_phase()
  */
 Time Time::next_moon_phase(const Angle& phase) const {
-  Time t(novas_next_moon_phase(jd(NOVAS_TDB), phase.deg()), leap_seconds(), dUT1().seconds(), NOVAS_TDB);
+  Time t(novas_next_moon_phase(phase.deg(), jd(NOVAS_TDB)), leap_seconds(), dUT1().seconds(), NOVAS_TDB);
   if(!t.is_valid())
     novas_trace_invalid("Time::next_moon_phase()");
   return t;
