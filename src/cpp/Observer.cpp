@@ -45,23 +45,22 @@ const Observer *Observer::copy() const {
 }
 
 /**
- * Checks if this observer is at a geodetic location, such as an observer at a fixed observatory
- * location, or an airborne observer.
+ * Checks if this observer can be cast to a GeodeticObserver.
  *
- * @return    `true` is this a geodetic observer on or near Earth's surface, otherwise `false`
+ * @return    `true` is this observer is an instance of GeodeticObserver, otherwise `false`.
  *
- * @sa is_geocentric()
+ * @sa GeodeticObserver, is_geocentric()
  */
 bool Observer::is_geodetic() const {
   return false;
 }
 
 /**
- * Checks if this is a fictious observer located at the geocenter.
+ * Checks if this observer can be cast to a GeocentricObserver.
  *
- * @return    `true` if this observer is located at the geocenter, otherwise `false`
+ * @return    `true` if this observer is an instance of GeocentricObserver, otherwise `false`.
  *
- * @sa is_geodetic()
+ * @sa GeocentricObserver, is_geodetic()
  */
 bool Observer::is_geocentric() const {
   return false;

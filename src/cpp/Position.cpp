@@ -130,7 +130,6 @@ Velocity Position::operator/(const Interval& dt) const {
   return v;
 }
 
-
 /**
  * Returns the distance to the location indicated by this position (that is the absolute value of
  * this position vector).

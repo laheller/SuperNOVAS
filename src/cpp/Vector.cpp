@@ -88,7 +88,7 @@ double Vector::z() const {
  */
 double Vector::operator[](int idx) const {
   if(idx < 0 || idx >= 3) {
-    novas_set_errno(ERANGE, "Position::operator[]", "index %d is out of range [0:2]", idx);
+    novas_set_errno(ERANGE, "Vector::operator[]", "index %d is out of range [0:2]", idx);
     return NAN;
   }
   return _component[idx];
