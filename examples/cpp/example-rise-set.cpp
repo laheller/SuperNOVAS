@@ -164,7 +164,7 @@ int main(int argc, const char *argv[]) {
     std::cout << " will not set below " << el.to_string() << " degrees\n";
   }
   else {
-    std::cout << " will set below " << el.to_string() << " degrees at  : " << t_rise.to_string() << "\n";
+    std::cout << " will set below " << el.to_string() << " degrees at  : " << t_set.to_string() << "\n";
   }
 
 
