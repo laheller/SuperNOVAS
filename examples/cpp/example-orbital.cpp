@@ -77,36 +77,6 @@ int main() {
 
 
   // -------------------------------------------------------------------------
-  // ... Or, you could define orbitals for a satellite instead:
-  // E.g. Callisto's orbital parameters from JPL Horizons
-  // https://ssd.jpl.nasa.gov/sats/elem/sep.html
-  // 1882700. 0.007 43.8  87.4  0.3 309.1 16.690440 277.921 577.264 268.7 64.8
-
-  // Callisto's orbit is around Jupiter, and defined w.r.t. to Jpiter's orbital system,
-  // whose pole is defined in ICRS equatorial coordinates.
-  system = OrbitalSystem::ecliptic(Planet::jupiter())
-          .pole(268.7 * Unit::deg, 64.8 * Unit::deg, Equinox::icrs());
-
-  // Start with the essential parameters...
-  orbit = Orbital(system,
-          NOVAS_JD_J2000,           // TDB-based Julian date of parameters
-          1882700.0 * Unit::km,     // Semi-major axis (a)
-          87.4 * Unit::deg,         // mean anomaly (M0)
-          16.690440 * Unit::day);   // orbital period (T)
-
-  // Add eccentricity (e) and argument of periapsis (omega), and apsis rotation
-  orbit.eccentricity(0.007, 43.8 * Unit::deg);
-  orbit.apsis_period(277.921 * Unit::yr);
-
-  // Add inclination (i) and argument of rising node (Omega), and node rotation
-  orbit.inclination(0.3 * Unit::deg, 309.1 * Unit::deg);
-  orbit.node_period(577.264 * Unit::yr);
-
-  // Set Callisto as the observed object
-  auto callisto = orbit.to_source("Callisto");
-
-
-  // -------------------------------------------------------------------------
   // Define observer somewhere on Earth (we can also define observers in Earth
   // or Sun orbit, at the geocenter or at the Solary-system barycenter...)
 
@@ -124,13 +94,13 @@ int main() {
 
   // ... Or you could set a time from a string calendar date
   /*
-    CalendarDate date = Calendar::gregorian().parse_date("2026-01-09 12:33:15.342+0200");
-    if(!date) {
-      std::cerr << "ERROR! could not parse date string.\n";
-      return 1;
-    }
-    Time t = date.value().to_time(eop, NOVAS_UTC);
-   */
+  CalendarDate date = Calendar::gregorian().parse_date("2026-01-09 12:33:15.342+0200");
+  if(!date) {
+    std::cerr << "ERROR! could not parse date string.\n";
+    return 1;
+  }
+  Time t = date.value().to_time(eop, NOVAS_UTC);
+  */
 
   // ... Or you could set a time as a Julian date any known timescale.
   //Time t(NOVAS_JD_J2000, 32, 0.0);
@@ -190,15 +160,51 @@ int main() {
 
 
   // -------------------------------------------------------------------------
-  // Repeat for Callisto:
+  // ... Or, you could define orbitals for a satellite instead:
+  // E.g. Callisto's orbital parameters from JPL Horizons
+  // https://ssd.jpl.nasa.gov/sats/elem/sep.html
+  // 1882700. 0.007 43.8  87.4  0.3 309.1 16.690440 277.921 577.264 268.7 64.8
+
+  // Callisto's orbit is around Jupiter, and defined w.r.t. to Jpiter's
+  // orbital system, whose pole is defined in ICRS equatorial coordinates
+  //
+  // However, to get positions for Callisto from it's orbit you will need an
+  // ephemeris provider for Jupiter's position at the orbital center (see
+  // commented CALCEPH section further above).
+  /*
+  system = OrbitalSystem::ecliptic(Planet::jupiter())
+          .pole(268.7 * Unit::deg, 64.8 * Unit::deg, Equinox::icrs());
+
+  // Start with the essential parameters...
+  orbit = Orbital(system,
+          NOVAS_JD_J2000,           // TDB-based Julian date of parameters
+          1882700.0 * Unit::km,     // Semi-major axis (a)
+          87.4 * Unit::deg,         // mean anomaly (M0)
+          16.690440 * Unit::day);   // orbital period (T)
+
+  // Add eccentricity (e) and argument of periapsis (omega), and apsis rotation
+  orbit.eccentricity(0.007, 43.8 * Unit::deg);
+  orbit.apsis_period(277.921 * Unit::yr);
+
+  // Add inclination (i) and argument of rising node (Omega), and node rotation
+  orbit.inclination(0.3 * Unit::deg, 309.1 * Unit::deg);
+  orbit.node_period(577.264 * Unit::yr);
+
+  // Set Callisto as the observed object
+  auto callisto = orbit.to_source("Callisto");
+
+  // No calculate apparent and horizontal positions for Callisto
   apparent = callisto.apparent_in(frame);
   hor = apparent.to_horizontal().to_refracted(novas_optical_refraction, weather);
 
   std::cout << "Ceres    : \n";
   std::cout << "  apparent  : " << apparent.to_string() << "\n";
   std::cout << "  horizontal: " << hor.to_string() << "\n";
+  */
 
-  // Close the CALCEPH ephemeris files we used before we exit
+
+  // -------------------------------------------------------------------------
+  // Clean up before we exit...
   //calceph_close(planets);
 
   return 0;
