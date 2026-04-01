@@ -10,12 +10,13 @@
 #ifndef NOVAS_CALCEPH_H_
 #define NOVAS_CALCEPH_H_
 
-#  include <calceph.h>
-#  include "novas.h"
+#include <calceph.h>
 
 #if __cplusplus
 extern "C" {
 #endif
+
+#include "novas.h"
 
 /// @ingroup solar-system
 int novas_calceph_is_thread_safe();
