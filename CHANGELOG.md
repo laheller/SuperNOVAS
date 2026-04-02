@@ -19,6 +19,8 @@ Upcoming feature release, introducing a proper C++ API for the first time, and b
  
  - #299: Fix memory leak in `Frame`. (thanks to aleberti)
 
+ - #305: `novas_geom_posvel()` returned velocities were referenced to SSB, not the observer.
+
 ### Added
 
  - #256: New C++11 API to wrap the C99 functions into a higher-level, easier to use, and object-oriented interface.
