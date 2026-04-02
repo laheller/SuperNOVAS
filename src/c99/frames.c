@@ -767,8 +767,13 @@ int novas_geom_posvel(const object *restrict source, const novas_frame *restrict
     memcpy(pos, pos1, sizeof(pos1));
   }
   if(vel) {
-    prop_error(fn, icrs_to_sys(frame, vel1, sys), 0);
-    memcpy(vel, vel1, sizeof(vel1));
+    int k;
+
+    // Change velocity reference from SSB to observer
+    for(k = 3; --k >= 0; )
+      vel[k] = novas_add_vel(vel1[k], -frame->obs_vel[k]);
+
+    prop_error(fn, icrs_to_sys(frame, vel, sys), 0);
   }
 
   return 0;
@@ -826,6 +831,7 @@ int novas_sky_pos(const object *restrict object, const novas_frame *restrict fra
   static const char *fn = "novas_sky_pos";
 
   double d_sb, pos[3], vel[3], vpos[3];
+  int k;
 
   if(!object)
     return novas_error(-1, EINVAL, fn, "NULL input object");
@@ -844,6 +850,10 @@ int novas_sky_pos(const object *restrict object, const novas_frame *restrict fra
 
   prop_error(fn, novas_geom_posvel(object, frame, NOVAS_ICRS, pos, vel), 0);
 
+  // Change velocity reference from observer to SSB
+  for(k = 3; --k >= 0; )
+    vel[k] = novas_add_vel(vel[k], frame->obs_vel[k]);
+
   out->dis = novas_vlen(pos);
 
   // ---------------------------------------------------------------------
@@ -853,8 +863,6 @@ int novas_sky_pos(const object *restrict object, const novas_frame *restrict fra
     d_sb = out->dis;
   }
   else {
-    int k;
-
     // Calculate distance to Sun.
     d_sb = 0.0;
     for(k = 3; --k >= 0;) {
@@ -873,21 +881,20 @@ int novas_sky_pos(const object *restrict object, const novas_frame *restrict fra
   }
   else {
     double psrc[3]; // Barycentric position of Solar-system source (antedated)
-    int i;
 
     // A.K.: For this we calculate gravitational deflection of the observer seen from the source
     // i.e., reverse tracing the light to find the direction in which it was emitted.
-    for(i = 3; --i >= 0;) {
-      vpos[i] = -pos[i];
-      psrc[i] = pos[i] + frame->obs_pos[i];
+    for(k = 3; --k >= 0;) {
+      vpos[k] = -pos[k];
+      psrc[k] = pos[k] + frame->obs_pos[k];
     }
 
     // vpos -> deflected direction in which observer is seen from source.
     prop_error(fn, grav_planets(vpos, psrc, &frame->planets, vpos), 70);
 
     // vpos -> direction in which light was emitted from observer's perspective...
-    for(i = 3; --i >= 0;)
-      vpos[i] = -vpos[i];
+    for(k = 3; --k >= 0;)
+      vpos[k] = -vpos[k];
   }
 
   prop_error(fn, novas_geom_to_app(frame, pos, sys, out), 70);
