@@ -39,11 +39,14 @@ class     AstrometricPosition;
 class   Velocity;
 class   Interferometric;
 class Equinox;
-class Coordinate;
-class Interval;
-class Angle;
-class   TimeAngle;
-class ScalarVelocity;
+class Scalar;
+class   Coordinate;
+class   Interval;
+class   Angle;
+class     TimeAngle;
+class   ScalarVelocity;
+class   Temperature;
+class   Pressure;
 class Spherical;
 class   Horizontal;
 class   Equatorial;
@@ -53,8 +56,6 @@ class EOP;
 class Calendar;
 class CalendarDate;
 class Time;
-class Temperature;
-class Pressure;
 class Weather;
 class Site;
 class Observer;
@@ -274,6 +275,32 @@ public:
   explicit operator bool() const { return _valid; }
 };
 
+
+/**
+ * Abstract base class for scalar quantities, expressed in standard S.I. units.
+ *
+ * @sa Angle, TimeAngle, Interval, Coordinate, ScalarVelocity, Temperature, Pressure
+ */
+class Scalar : public Validating {
+protected:
+  double _value;      ///< The value in S.I. units
+
+  Scalar() : _value(NAN) {}
+
+  Scalar(double si_value);
+
+public:
+
+  virtual ~Scalar() {}
+
+  double SI_value() const;
+
+  virtual std::string SI_unit() const = 0;
+
+  virtual std::string to_string(int decimals = 3) const;
+};
+
+
 /**
  * %Equatorial coordinate system, defining the orientation of the equator and the location of the
  * equinox, relative to which the right ascention and declination (RA/Dec) coordinates are defined.
@@ -366,12 +393,10 @@ public:
  * @sa Position
  * @ingroup util
  */
-class Coordinate : public Validating {
+class Coordinate : public Scalar {
 private:
-  double _meters;         ///< [m] stored distance
-
   /// Instantiate undefined coordinates.
-  Coordinate() : _meters(NAN) {}
+  Coordinate() : Scalar() {}
 
 public:
   explicit Coordinate(double meters);
@@ -398,7 +423,9 @@ public:
 
   Angle parallax() const;
 
-  std::string to_string(int decimals = 3) const;
+  std::string SI_unit() const override;
+
+  std::string to_string(int decimals = 3) const override;
 
   static Coordinate from_parallax(const Angle& parallax);
 
@@ -415,9 +442,8 @@ public:
  * @sa Time, TimeAngle
  * @ingroup util
  */
-class Interval : public Validating {
+class Interval : public Scalar {
 private:
-  double _seconds;               ///< [s] stored time of the interval
   enum novas_timescale _scale;   ///< store timescale of the interval
 
 public:
@@ -462,7 +488,9 @@ public:
 
   Interval to_timescale(enum novas_timescale scale) const;
 
-  std::string to_string(int decimals = 3) const;
+  std::string SI_unit() const override;
+
+  std::string to_string(int decimals = 3) const override;
 
   static const Interval& zero();
 };
@@ -475,17 +503,12 @@ public:
  * @sa TimeAngle
  * @ingroup util
  */
-class Angle : public Validating {
+class Angle : public Scalar {
 private:
   /// Instantiates an indefined angle
-  Angle()  : _rad(NAN) {}
-
-protected:
-  double _rad;      ///< [rad] stored angle value, usually [-&pi;:&pi;), but can be different for subclasses.
+  Angle() : Scalar() {}
 
 public:
-
-  virtual ~Angle() {}
 
   explicit Angle(double radians);
 
@@ -515,7 +538,13 @@ public:
 
   double fraction() const;
 
-  virtual std::string to_string(enum novas_separator_type separator = NOVAS_SEP_UNITS_AND_SPACES, int decimals = 3) const;
+  std::string SI_unit() const override;
+
+  std::string to_string(int decimals = 3) const override {
+    return to_string(NOVAS_SEP_UNITS_AND_SPACES, decimals);
+  }
+
+  virtual std::string to_string(enum novas_separator_type separator, int decimals = 3) const;
 
   static const Angle& undefined();
 
@@ -597,7 +626,7 @@ protected:
 
 public:
 
-  virtual ~Vector() {};
+  virtual ~Vector() {}
 
   Vector operator*(double r) const;
 
@@ -773,12 +802,11 @@ public:
  * @sa Position
  * @ingroup util, spectral
  */
-class ScalarVelocity : public Validating {
+class ScalarVelocity : public Scalar {
 private:
-  double _ms;       ///< [m/s] stored speed
 
   /// Instantiates an undefined scalar velocity
-  ScalarVelocity() : _ms(NAN) {}
+  ScalarVelocity() : Scalar() {}
 
 public:
   explicit ScalarVelocity(double m_per_s);
@@ -824,7 +852,9 @@ public:
 
   Velocity in_direction(const Vector& direction) const;
 
-  std::string to_string(int decimals = 3) const;
+  std::string SI_unit() const override;
+
+  std::string to_string(int decimals = 3) const override;
 
   static ScalarVelocity from_redshift(double z);
 
@@ -855,7 +885,7 @@ protected:
   }
 
 public:
-  virtual ~Spherical() {};
+  virtual ~Spherical() {}
 
   Spherical(double longitude_rad, double latitude_rad);
 
@@ -1065,10 +1095,8 @@ public:
  * @sa Weather
  * @ingroup util
  */
-class Temperature : public Validating {
+class Temperature : public Scalar {
 private:
-  double _deg_C;        ///< [C] stored temperature
-
   explicit Temperature(double deg_C);
 
 public:
@@ -1078,7 +1106,9 @@ public:
 
   double farenheit() const;
 
-  std::string to_string() const;
+  std::string SI_unit() const override;
+
+  std::string to_string(int decimals = 1) const override;
 
   static Temperature celsius(double value);
 
@@ -1096,10 +1126,8 @@ public:
  * @sa Weather
  * @ingroup util
  */
-class Pressure : public Validating {
+class Pressure : public Scalar {
 private:
-  double _pascal;     ///< [Pa] stored pressure
-
   explicit Pressure(double value);
 
 public:
@@ -1117,7 +1145,9 @@ public:
 
   double atm() const;
 
-  std::string to_string() const;
+  std::string SI_unit() const override;
+
+  std::string to_string(int decimals = 3) const override;
 
   static Pressure Pa(double value);
 
@@ -1808,7 +1838,7 @@ protected:
   Source() {}
 
 public:
-  virtual ~Source() {};
+  virtual ~Source() {}
 
   /**
    * Returns a pointer to a newly allocated copy of this instance

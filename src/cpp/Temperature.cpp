@@ -21,15 +21,15 @@ namespace supernovas {
  *
  * @sa celsius(), kelvin(), farenheit()
  */
-Temperature::Temperature(double deg_C) : _deg_C(deg_C) {
+Temperature::Temperature(double deg_C) : Scalar(deg_C) {
   static const char *fn = "Temperature()";
 
-  if(!isfinite(deg_C))
-    novas_set_errno(EINVAL, fn, "input value is NAN or infinite");
-  else if(kelvin() < 0.0)
+  if(!is_valid())
+    novas_trace_invalid(fn);
+  else if(_value < 0.0) {
     novas_set_errno(EINVAL, fn, "input value is below 0K");
-  else
-    _valid = true;
+    _valid = false;
+  }
 }
 
 /**
@@ -40,7 +40,7 @@ Temperature::Temperature(double deg_C) : _deg_C(deg_C) {
  * @sa kelvin(), farenheit()
  */
 double Temperature::celsius() const {
-  return _deg_C;
+  return _value;
 }
 
 /**
@@ -51,7 +51,7 @@ double Temperature::celsius() const {
  * @sa celsius(), farenheit()
  */
 double Temperature::kelvin() const {
-  return 273.15 + _deg_C;
+  return 273.15 + _value;
 }
 
 /**
@@ -62,17 +62,22 @@ double Temperature::kelvin() const {
  * @sa celsius(), kelvin()
  */
 double Temperature::farenheit() const {
-  return 32.0 + 1.8 * _deg_C;
+  return 32.0 + 1.8 * _value;
+}
+
+std::string Temperature::SI_unit() const {
+  return "K";
 }
 
 /**
  * Returns a human-readable string representation of this temperature value.
  *
- * @return    a string with the human readable representation of this temperature.
+ * @param decimals  (optional) [0:16] decimal places to print (default: 1).
+ * @return          a string with the human readable representation of this temperature.
  */
-std::string Temperature::to_string() const {
+std::string Temperature::to_string(int decimals) const {
   char s[40] = {'\0'};
-  snprintf(s, sizeof(s), "%.1f C", _deg_C);
+  snprintf(s, sizeof(s), "%.1f C", _value);
   return std::string(s);
 }
 
