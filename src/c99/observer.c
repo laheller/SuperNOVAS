@@ -574,6 +574,134 @@ int make_solar_system_observer(const double *sc_pos, const double *sc_vel, obser
   return 0;
 }
 
+
+/**
+ * Computes the geocentric GCRS position and velocity of an observer.
+ *
+ * NOTES:
+ *
+ *  - For Earth-based observers, this function does not include polar wobble corrections, so the
+ *    returned GCRS positions are accurate at the tens of meters level only. You might use
+ *    `novas_site_gcrs_posvel()` instead if higher accuracy is required for Earth-based observers.
+ *
+ * @param jd_tt       [day] Terrestrial Time (TT) based Julian date.
+ * @param ut1_to_tt   [s] TT - UT1 time difference in seconds
+ * @param accuracy    NOVAS_FULL_ACCURACY (0) or NOVAS_REDUCED_ACCURACY (1)
+ * @param obs         observer location.
+ * @param[out] pos    [AU] Position 3-vector of observer, with respect to origin at geocenter,
+ *                    referred to GCRS axes, components in AU. (It may be NULL if not required.)
+ * @param[out] vel    [AU/day] Velocity 3-vector of observer, with respect to origin at geocenter,
+ *                    referred to GCRS axes, components in AU/day. (It must be distinct from the
+ *                    pos output vector, and may be NULL if not required)
+ * @return            0 if successful, -1 if the 'obs' is NULL or the two output vectors are
+ *                    the same, or else 1 if 'accuracy' is invalid, or 2 if 'obserrver->where' is
+ *                    invalid.
+ *
+ * @sa novas_site_gcrs_posvel(), novas_make_frame(), make_observer(), get_ut1_to_tt()
+ */
+short geo_posvel(double jd_tt, double ut1_to_tt, enum novas_accuracy accuracy, const observer *restrict obs,
+        double *restrict pos, double *restrict vel) {
+  static const char *fn = "geo_posvel";
+
+  double pos1[3], vel1[3];
+
+  if(!obs)
+    return novas_error(-1, EINVAL, fn, "NULL observer location pointer");
+
+  if(pos == vel)
+    return novas_error(-1, EINVAL, fn, "identical output pos and vel 3-vectors @ %p", pos);
+
+  // Invalid value of 'accuracy'.
+  if(accuracy != NOVAS_FULL_ACCURACY && accuracy != NOVAS_REDUCED_ACCURACY)
+    return novas_error(1, EINVAL, fn, "invalid accuracy: %d", accuracy);
+
+  switch(obs->where) {
+
+    case NOVAS_OBSERVER_AT_GEOCENTER:                   // Observer at geocenter.  Trivial case.
+      if(pos)
+        memset(pos, 0, XYZ_VECTOR_SIZE);
+      if(vel)
+        memset(vel, 0, XYZ_VECTOR_SIZE);
+      return 0;
+
+      // Other two cases: Get geocentric position and velocity vectors of
+      // observer wrt equator and equinox of date.
+
+    case NOVAS_OBSERVER_ON_EARTH:
+    case NOVAS_AIRBORNE_OBSERVER: {                     // Observer on surface of Earth.
+      const double kms = DAY / AU_KM;
+
+      // Compute UT1 and sidereal time.
+      double jd_ut1 = jd_tt - (ut1_to_tt / DAY);
+
+      if(novas_get_debug_mode() == NOVAS_DEBUG_EXTRA)
+        return novas_error(-1, EINVAL, fn, "the returned vectors may be inaccurate without polar offsets. [DEBUG_EXTRA]");
+
+      // Function 'terra' does the hard work, given sidereal time.
+      terra(&obs->on_surf, novas_gast(jd_ut1, ut1_to_tt, accuracy), pos1, vel1);
+
+      if(obs->where == NOVAS_AIRBORNE_OBSERVER) {
+        int i;
+        // Add in the aircraft motion
+        for(i = 0; i < 3; i++)
+          vel1[i] = novas_add_vel(vel1[i], obs->near_earth.sc_vel[i] * kms);
+      }
+
+      break;
+    }
+
+    case NOVAS_OBSERVER_IN_EARTH_ORBIT: {               // Observer on near-earth spacecraft.
+      const double kms = DAY / AU_KM;
+      int i;
+
+      // Convert units to AU and AU/day.
+      for(i = 3; --i >= 0;) {
+        pos1[i] = obs->near_earth.sc_pos[i] / AU_KM;
+        vel1[i] = obs->near_earth.sc_vel[i] * kms;
+      }
+
+      break;
+    }
+
+    case NOVAS_SOLAR_SYSTEM_OBSERVER: {               // Observer in Solar orbit
+      const object earth = NOVAS_EARTH_INIT;
+      const double tdb[2] = { jd_tt, tt2tdb(jd_tt) / DAY };
+      int i;
+
+
+      // Get the position and velocity of the geocenter rel. to SSB
+      prop_error(fn, ephemeris(tdb, &earth, NOVAS_BARYCENTER, accuracy, pos1, vel1), 0);
+
+      // Return velocities w.r.t. the geocenter.
+      for(i = 3; --i >= 0;) {
+        if(pos)
+          pos[i] = obs->near_earth.sc_pos[i] - pos1[i];
+        if(vel)
+          vel[i] = novas_add_vel(obs->near_earth.sc_vel[i], -vel1[i]);
+      }
+
+      // Already in GCRS...
+      return 0;
+    }
+
+    default:
+      return novas_error(2, EINVAL, fn, "invalid observer type (where): %d", obs->where);
+  }
+
+  // For these calculations we can assume TDB = TT (< 2 ms difference)...
+
+  // Transform geocentric position vector of observer to GCRS.
+  if(pos)
+    tod_to_gcrs(jd_tt, accuracy, pos1, pos); // Use TT for TDB
+
+  // Transform geocentric velocity vector of observer to GCRS.
+  if(vel)
+    tod_to_gcrs(jd_tt, accuracy, vel1, vel); // Use TT for TDB
+
+  return 0;
+}
+
+
 /**
  * Corrects position vector for aberration of light.  Algorithm includes relativistic terms.
  *
@@ -640,6 +768,12 @@ int aberration(const double *pos, const double *vobs, double lighttime, double *
  * Calculates the ICRS position and velocity of the observer relative to the Solar System
  * Barycenter (SSB).
  *
+ * NOTES:
+ *
+ *  - This implementation does not take polar wobble corrections into account for Earth-based
+ *    (ITRS) observing locations. For those, it provides position vectors at the tens of meters
+ *    level only.
+ *
  * @param jd_tdb        [day] Barycentric Dynamical Time (TDB) based Julian date.
  * @param ut1_to_tt     [s] TT - UT1 time difference. Used only when 'location->where' is
  *                      NOVAS_OBSERVER_ON_EARTH (1) or NOVAS_OBSERVER_IN_EARTH_ORBIT (2), or
@@ -664,7 +798,7 @@ int aberration(const double *pos, const double *vobs, double lighttime, double *
  * @author Attila Kovacs
  * @since 1.3
  *
- * @see novas_make_frame()
+ * @sa novas_make_frame()
  */
 int obs_posvel(double jd_tdb, double ut1_to_tt, enum novas_accuracy accuracy, const observer *restrict obs,
         const double *restrict geo_pos, const double *restrict geo_vel, double *restrict pos, double *restrict vel) {
@@ -731,6 +865,81 @@ int obs_posvel(double jd_tdb, double ut1_to_tt, enum novas_accuracy accuracy, co
     default:
       // Nothing to do
       ;
+  }
+
+  return 0;
+}
+
+/**
+ * Returns precise GCRS postion and velocity vectors for an observer locate on or near Earth's
+ * surface.
+ *
+ * NOTES:
+ *
+ *  - unlike the original NOVAS `geo_posvel()`, this implementation takes the polar offsets into
+ *    account.
+ *
+ * @param ts        Astrometric time of oservation
+ * @param site      ITRF / GRS80 geodetic location on Earth
+ * @param v_itrs    surface velocity vecotri in ITRS, or NULL if observing from a fixed Earth
+ *                  location
+ * @param xp        [arcsec] Earth orientation parameter, polar offset in _x_, e.g. from the
+ *                  IERS Bulletins, and including diurnal libration and ocean tides. You can use
+ *                  0.0 if sub-arcsecond accuracy is not required.
+ * @param yp        [arcsec] Earth orientation parameter, polar offset in _y_, e.g. from the
+ *                  IERS Bulletins, and including diurnal libration and ocean tides. You can use
+ *                  0.0 if sub-arcsecond accuracy is not required.
+ * @param accuracy  NOVAS_FULL_ACCURACY (0) or NOVAS_REDUCED_ACCURACY (1)
+ * @param[out] pos  GCRS position vector of observer. It may be NULL if not required.
+ * @param[out] vel  GCRS velocity vector of observer. It may be NULL if not required.
+ * @return          0 if successful, or else -1 if any of the input pointers is NULL or if
+ *                  both output pointers are NULL (errno will be set to EINVAL).
+ *
+ * @author Attila Kovacs
+ * @since 1.6
+ *
+ * @sa geo_posvel()
+ */
+int novas_site_gcrs_posvel(const novas_timespec *restrict ts, const on_surface *restrict site, const double *restrict v_itrs,
+        double xp, double yp, enum novas_accuracy accuracy, double *restrict pos, double *restrict vel) {
+  static const char *fn = "novas_site_gcrs_posvel";
+
+  double tdb;
+
+  if(!ts)
+    return novas_error(-1, EINVAL, fn, "input time specification is NULL");
+
+  if(!site)
+    return novas_error(-1, EINVAL, fn, "input site is NULL");
+
+  if(accuracy != NOVAS_FULL_ACCURACY && accuracy != NOVAS_REDUCED_ACCURACY)
+    return novas_error(-1, EINVAL, fn, "invalid accuracy: %d", accuracy);
+
+  if(pos == vel)
+    return novas_error(-1, EINVAL, fn, "identical output vectors pos = vel", accuracy);
+
+  // ITRS
+  terra(site, 0.0, pos, vel);
+
+  // Add surface velocity...
+  if(vel && v_itrs) {
+    int k;
+    double kms = NOVAS_KM * NOVAS_DAY / NOVAS_AU;
+    for(k = 0; k < 3; k++)
+      vel[k] = novas_add_vel(vel[k], v_itrs[k] * kms);
+  }
+
+  tdb = novas_get_time(ts, NOVAS_TDB);
+
+  // ITRS -> GCRS
+  if(pos) {
+   itrs_to_tod(ts->ijd_tt, ts->fjd_tt, ts->ut1_to_tt, accuracy, xp, yp, pos, pos);
+   tod_to_gcrs(tdb, accuracy, pos, pos);
+  }
+
+  if(vel) {
+   itrs_to_tod(ts->ijd_tt, ts->fjd_tt, ts->ut1_to_tt, accuracy, xp, yp, vel, vel);
+   tod_to_gcrs(tdb, accuracy, pos, pos);
   }
 
   return 0;
@@ -1165,27 +1374,11 @@ int novas_site_uvw(const novas_timespec *restrict ts, const on_surface *restrict
   static const char *fn = "novas_site_uvw";
 
   double p[3] = {0.0}, v[3] = {0.0}, los[3] = {0.0};
-  double tdb;
 
-  if(!ts)
-    return novas_error(-1, EINVAL, fn, "input time specification is NULL");
+  if(novas_site_gcrs_posvel(ts, station, NULL, xp, yp, accuracy, p, v) != 0)
+    return novas_trace(fn, -1, 0);
 
-  if(!station)
-    return novas_error(-1, EINVAL, fn, "input observer station is NULL");
-
-  // ITRS pos/vel
-  terra(station, 0.0, p, v);
-
-  // ITRS -> TOD
-  prop_error(fn, itrs_to_tod(ts->ijd_tt, ts->fjd_tt, ts->ut1_to_tt, accuracy, xp, yp, p, p), 0);
-  itrs_to_tod(ts->ijd_tt, ts->fjd_tt, ts->ut1_to_tt, accuracy, xp, yp, v, v);
-
-  // TOD -> ICRS
-  tdb = novas_get_time(ts, NOVAS_TDB);
-  tod_to_gcrs(tdb, accuracy, p, p);
-  tod_to_gcrs(tdb, accuracy, v, v);
-  tod_to_gcrs(tdb, accuracy, geocentric_source, los);
-
+  tod_to_gcrs(novas_get_time(ts, NOVAS_TDB), accuracy, geocentric_source, los);
   prop_error(fn, novas_uvw(p, v, los, uvw), 0);
 
   return 0;

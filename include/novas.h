@@ -3375,6 +3375,10 @@ int novas_uvw(const double *restrict station_pos, const double *restrict station
 int novas_site_uvw(const novas_timespec *restrict ts, const on_surface *restrict station, const double *restrict geocentric_source,
         double xp, double yp, enum novas_accuracy accuracy, double *restrict uvw);
 
+/// @c_observer
+int novas_site_gcrs_posvel(const novas_timespec *restrict ts, const on_surface *restrict site, const double *restrict v_itrs,
+        double xp, double yp, enum novas_accuracy accuracy, double *restrict pos, double *restrict vel);
+
 
 // <================= END of SuperNOVAS API =====================>
 

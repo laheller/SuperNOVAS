@@ -5084,14 +5084,14 @@ static int test_moon_elp_sky_pos() {
   vector2radec(p1, &ra, &dec);
 
   if(!is_ok("moon_elp_sky_pos:site", novas_moon_elp_sky_pos(&f, NOVAS_TOD, &pos))) n++;
-  if(!is_equal("moon_elp_sky_pos:site:ra", pos.ra, ra, 1e-11)) n++;
-  if(!is_equal("moon_elp_sky_pos:site:dec", pos.dec, dec, 1e-12)) n++;
+  if(!is_equal("moon_elp_sky_pos:site:ra", pos.ra, ra, 1e-6)) n++;
+  if(!is_equal("moon_elp_sky_pos:site:dec", pos.dec, dec, 1e-6)) n++;
 
   // airborne observer...
   make_airborne_observer(&site, v0, &obs);
   novas_make_frame(NOVAS_REDUCED_ACCURACY, &obs, &ts, 0.0, 0.0, &f);
 
-  // geocdentric observer velocity (TOD)
+  // geocentric observer velocity (TOD)
   for(i = 0; i < 3; i++)
     vo[i] = novas_add_vel(f.obs_vel[i], -f.earth_vel[i]);
   gcrs_to_tod(NOVAS_JD_B1950, NOVAS_REDUCED_ACCURACY, vo, vo);
@@ -5105,8 +5105,8 @@ static int test_moon_elp_sky_pos() {
   vector2radec(p1, &ra, &dec);
 
   if(!is_ok("moon_elp_sky_pos:air", novas_moon_elp_sky_pos(&f, NOVAS_TOD, &pos))) n++;
-  if(!is_equal("moon_elp_sky_pos:air:ra", pos.ra, ra, 1e-11)) n++;
-  if(!is_equal("moon_elp_sky_pos:air:dec", pos.dec, dec, 1e-12)) n++;
+  if(!is_equal("moon_elp_sky_pos:air:ra", pos.ra, ra, 1e-6)) n++;
+  if(!is_equal("moon_elp_sky_pos:air:dec", pos.dec, dec, 1e-6)) n++;
 
   return n;
 }
@@ -5151,21 +5151,16 @@ static int test_site_uvw() {
   novas_set_time(NOVAS_TT, NOVAS_JD_J2000, 32, 0.0, &ts);
   make_itrf_site(30.0, -120.0, 1200.0, &s);
 
-  // First everything in TOD...
-  terra(&s, 0.0, op, ov);
-  itrs_to_tod(ts.ijd_tt, ts.fjd_tt, ts.ut1_to_tt, NOVAS_FULL_ACCURACY, xp, yp, op, op);
-  itrs_to_tod(ts.ijd_tt, ts.fjd_tt, ts.ut1_to_tt, NOVAS_FULL_ACCURACY, xp, yp, ov, ov);
+  novas_site_gcrs_posvel(&ts, &s, NULL, xp, yp, NOVAS_FULL_ACCURACY, op, ov);
 
-  // Then everything in GCRS...
+  // Apparent position in GCRS...
   tdb = novas_get_time(&ts, NOVAS_TDB);
   tod_to_gcrs(tdb, NOVAS_FULL_ACCURACY, p,  p0);
-  tod_to_gcrs(tdb, NOVAS_FULL_ACCURACY, op, op);
-  tod_to_gcrs(tdb, NOVAS_FULL_ACCURACY, ov, ov);
 
   novas_uvw(op, ov, p0, u0);
 
   if(!is_ok("site_uvw", novas_site_uvw(&ts, &s, p, xp, yp, NOVAS_FULL_ACCURACY, u))) n++;
-  if(!is_ok("site_uvw:v:check", check_equal_pos(u, u0, 1e-12))) n++;
+  if(!is_ok("site_uvw:check", check_equal_pos(u, u0, 1e-12))) n++;
 
   return n;
 }

@@ -1375,6 +1375,13 @@ protected:
   explicit Observer(enum novas_observer_place type, const Site& site = Site::undefined(), const Position& pos = Position::origin(),
           const Velocity& vel = Velocity::stationary());
 
+  /// @ingroup geometric
+  virtual Position gcrs_position_at(const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const;
+
+  /// @ingroup geometric
+  virtual Velocity gcrs_velocity_at(const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const;
+
+
 public:
 
   virtual ~Observer() {}
@@ -1433,6 +1440,13 @@ private:
 
   void diurnal_correct();
 
+protected:
+  /// @ingroup geometric
+  Position gcrs_position_at(const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const override;
+
+  /// @ingroup geometric
+  Velocity gcrs_velocity_at(const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const override;
+
 public:
 
   GeodeticObserver(const Site& site, const EOP& eop);
@@ -1452,7 +1466,7 @@ public:
 
   Velocity enu_velocity() const;
 
-  Geometric geocentric_at(const Time &time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const;
+  GeocentricObserver to_geocentric_at(const Time& time, enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const;
 
   const EOP& eop() const;
 
@@ -1472,9 +1486,9 @@ public:
 
   GeocentricObserver(const Position& pos, const Velocity& vel);
 
-  Position geocentric_position() const;
+  Position gcrs_position() const;
 
-  Velocity geocentric_velocity() const;
+  Velocity gcrs_velocity() const;
 
   const Observer *copy() const override;
 

@@ -143,11 +143,13 @@ const Time& Frame::time() const {
 }
 
 /**
- * Returns the Earth Orientation Parameters contained in this frame. The returned parameters are
- * valid only if this frame was defined for a geodetic observer location such as an observer at a
- * fixed site on Earth or an airborne observer location.
+ * Returns the Earth Orientation Parameters contained in this frame. The returned parameters
+ * include diurnal variations for libration and ocean tides, and are valid only if this frame was
+ * defined for a geodetic observer location such as an observer at a fixed site on Earth or an
+ * airborne observer location.
  *
- * @return    The Earth orientation parameters of this observing frame, or an undefined (invalid)
+ * @return    The Earth orientation parameters of this observing frame, including diurnal
+ *            variations for libration and ocean tides; or else an undefined (invalid)
  *            EOP if the observer is not on or near Earth's surface.
  *
  * @sa GeodeticObserver

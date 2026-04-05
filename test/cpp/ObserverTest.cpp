@@ -106,8 +106,8 @@ int main() {
   if(!test.equals("type(gc)", gc.type(), NOVAS_OBSERVER_AT_GEOCENTER)) n++;
   if(!test.check("is_geocentric(gc)", gc.is_geocentric())) n++;
   if(!test.check("is_geodetic(gc)", !gc.is_geodetic())) n++;
-  if(!test.check("geocentric_position(gc)", gc.geocentric_position() == Position::origin())) n++;
-  if(!test.check("geocentric_velocity(gc)", gc.geocentric_velocity() == Velocity::stationary())) n++;
+  if(!test.check("geocentric_position(gc)", gc.gcrs_position() == Position::origin())) n++;
+  if(!test.check("geocentric_velocity(gc)", gc.gcrs_velocity() == Velocity::stationary())) n++;
   if(!test.check("frame_at(reduced)", gc.frame_at(Time::j2000(), NOVAS_REDUCED_ACCURACY).is_valid())) n++;
   if(!test.check("frame_at(full)", !gc.frame_at(Time::j2000(), NOVAS_FULL_ACCURACY).is_valid())) n++;
   if(!test.equals("to_string(gc)", gc.to_string(), "Geocentric Observer")) n++;
@@ -126,16 +126,16 @@ int main() {
 
   GeocentricObserver ogx = Observer::in_earth_orbit(Position::undefined(), Velocity::undefined());
   if(!test.check("is_valid(orbit invalid)", !ogx.is_valid())) n++;
-  if(!test.check("geocentric_position(orbit invalid)", !ogx.geocentric_position().is_valid())) n++;
-  if(!test.check("geocentric_velocity(orbit invalid)", !ogx.geocentric_velocity().is_valid())) n++;
+  if(!test.check("geocentric_position(orbit invalid)", !ogx.gcrs_position().is_valid())) n++;
+  if(!test.check("geocentric_velocity(orbit invalid)", !ogx.gcrs_velocity().is_valid())) n++;
 
   GeocentricObserver o1 = Observer::in_earth_orbit(p1, v1);
   if(!test.check("is_valid(orbit)", o1.is_valid())) n++;
   if(!test.equals("type(orbit)", o1.type(), NOVAS_OBSERVER_IN_EARTH_ORBIT)) n++;
   if(!test.check("is_geocentric(orbit)", o1.is_geocentric())) n++;
   if(!test.check("is_geodetic(orbit)", !o1.is_geodetic())) n++;
-  if(!test.check("geocentric_position(orbit)", o1.geocentric_position() == p1)) n++;
-  if(!test.check("geocentric_velocity(orbit)", o1.geocentric_velocity() == v1)) n++;
+  if(!test.check("geocentric_position(orbit)", o1.gcrs_position() == p1)) n++;
+  if(!test.check("geocentric_velocity(orbit)", o1.gcrs_velocity() == v1)) n++;
   if(!test.equals("to_string(orbit)", o1.to_string(), "Geocentric Observer at Position (10000.000 km, 0.000 m, 0.000 m) moving at Velocity (0.001 km/s, -0.002 km/s, 0.003 km/s)")) n++;
 
   o = o1._novas_observer();
