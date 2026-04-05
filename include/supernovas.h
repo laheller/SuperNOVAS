@@ -1053,10 +1053,8 @@ public:
 
   Ecliptic to_tod(const Time& time) const;
 
-  /// @ingroup equatorial
   Equatorial to_equatorial(enum novas_accuracy accuracy = NOVAS_FULL_ACCURACY) const;
 
-  /// @ingroup nonequatorial
   Galactic to_galactic() const;
 
   std::string to_string(enum novas_separator_type separator = NOVAS_SEP_UNITS_AND_SPACES, int decimals = 3) const override;
@@ -1095,10 +1093,8 @@ public:
 
   Angle distance_to(const Galactic& other) const;
 
-  /// @ingroup equatorial
   Equatorial to_equatorial() const;
 
-  /// @ingroup nonequatorial
   Ecliptic to_ecliptic() const;
 
   std::string to_string(enum novas_separator_type separator = NOVAS_SEP_UNITS_AND_SPACES, int decimals = 3) const override;
