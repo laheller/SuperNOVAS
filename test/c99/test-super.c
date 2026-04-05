@@ -5038,9 +5038,7 @@ static int test_moon_elp_posvel() {
   novas_make_frame(NOVAS_REDUCED_ACCURACY, &obs, &ts, 0.0, 0.0, &f);
 
   // observer pos at time.
-  terra(&obs.on_surf, novas_time_gst(&ts, NOVAS_REDUCED_ACCURACY), p1, v1);
-  tod_to_gcrs(NOVAS_JD_B1950, NOVAS_FULL_ACCURACY, p1, p1);
-  tod_to_gcrs(NOVAS_JD_B1950, NOVAS_FULL_ACCURACY, v1, v1);
+  novas_site_gcrs_posvel(&ts, &obs.on_surf, NULL, 0.0, 0.0, NOVAS_FULL_ACCURACY, p1, v1);
 
   // moon rel. observer (in TOD)
   for(i = 0; i < 3; i++) {
@@ -5079,7 +5077,7 @@ static int test_moon_elp_sky_pos() {
   novas_moon_elp_posvel(&f, NOVAS_TOD, p, NULL);
 
   // observer pos/vel at time (in TOD)
-  terra(&obs.on_surf, novas_time_gst(&ts, NOVAS_REDUCED_ACCURACY), NULL, vo);
+  novas_site_gcrs_posvel(&ts, &obs.on_surf, NULL, 0.0, 0.0, NOVAS_FULL_ACCURACY, NULL, vo);
   aberration(p, vo, 0.0, p1);
   vector2radec(p1, &ra, &dec);
 
