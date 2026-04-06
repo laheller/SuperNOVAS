@@ -27,9 +27,8 @@
 #include "novas.h"
 
 /// \cond PRIVATE
-#define DTA_SECONDS 32.184                ///< [s] TT - TAI time difference
-#define DTA         (DTA_SECONDS / DAY)        ///< [day] TT - TAI time difference
-#define GPS2TAI     (19.0 / DAY)          ///< [day] TAI - GPS time difference
+#define DTA         32.184                ///< [s] TT - TAI time difference
+#define GPS2TAI     19.0                  ///< [day] TAI - GPS time difference
 
 #define IDAY        86400                 ///< [s] 1 day
 
@@ -67,7 +66,7 @@
  */
 #define TC_LG          6.969290134e-10
 
-#define TC_TDB0        (6.55e-5 / DAY)    ///< TDB time offset at TC_T0
+#define TC_TDB0        6.55e-5            ///< [s] TDB time offset at TC_T0
 
 #define E9             1000000000         ///< 10<sup>9</sup> as integer
 
@@ -506,6 +505,30 @@ int novas_set_str_time(enum novas_timescale timescale, const char *restrict str,
   return novas_set_time(timescale, jd, leap, dut1, time);
 }
 
+static double tt_offset(const novas_timespec *ts, enum novas_timescale timescale) {
+  switch(timescale) {
+     case NOVAS_TT:
+       return 0.0;
+     case NOVAS_TCB:
+       return ts->tt2tdb - TC_TDB0 + TC_LB * ((ts->ijd_tt - TC_T0) + ts->fjd_tt) * DAY;
+     case NOVAS_TCG:
+       return TC_LG * ((ts->ijd_tt - TC_T0) + ts->fjd_tt) * DAY;
+     case NOVAS_TDB:
+       return ts->tt2tdb;
+     case NOVAS_TAI:
+       return -DTA;
+     case NOVAS_GPS:
+       return -(DTA + GPS2TAI);
+     case NOVAS_UTC:
+       return -(ts->ut1_to_tt + ts->dut1);
+     case NOVAS_UT1:
+       return -ts->ut1_to_tt;
+     default:
+       novas_set_errno(EINVAL, "tt_offset", "Invalid timescale: %d", timescale);
+       return NAN;
+   }
+}
+
 /**
  * Sets an astronomical time to the split Julian Date value, defined in the specified timescale.
  * The split into the integer and fractional parts can be done in any convenient way. The highest
@@ -561,39 +584,17 @@ int novas_set_split_time(enum novas_timescale timescale, long ijd, double fjd, i
 
   time->tt2tdb = NAN;
   time->dut1 = dut1;
-  time->ut1_to_tt = leap - dut1 + DTA_SECONDS;
+  time->ut1_to_tt = leap - dut1 + DTA;
+  time->ijd_tt = ijd;
+  time->fjd_tt = fjd;
 
-  switch(timescale) {
-    case NOVAS_TT:
-      break;
-    case NOVAS_TCB:
-      time->tt2tdb = tt2tdb_hp(ijd + fjd);
-      fjd -= time->tt2tdb / DAY - TC_TDB0;
-      fjd -= TC_LB * ((ijd - TC_T0) + fjd);
-      break;
-    case NOVAS_TCG:
-      fjd -= TC_LG * ((ijd - TC_T0) + fjd);
-      break;
-    case NOVAS_TDB: {
-      time->tt2tdb = tt2tdb_hp(ijd + fjd);
-      fjd -= time->tt2tdb / DAY;
-      break;
-    }
-    case NOVAS_TAI:
-      fjd += DTA;
-      break;
-    case NOVAS_GPS:
-      fjd += (DTA + GPS2TAI);
-      break;
-    case NOVAS_UTC:
-      fjd += (time->ut1_to_tt + time->dut1) / DAY;
-      break;
-    case NOVAS_UT1:
-      fjd += time->ut1_to_tt / DAY;
-      break;
-    default:
-      return novas_error(-1, EINVAL, fn, "Invalid timescale: %d", timescale);
-  }
+  if(timescale == NOVAS_TCB || timescale == NOVAS_TDB)
+    time->tt2tdb = tt2tdb_hp(ijd + fjd);
+
+  errno = 0;
+  fjd -= tt_offset(time, timescale) / DAY;
+  if(errno)
+    return novas_trace(fn, -1, 0);
 
   ifjd = (long) floor(fjd);
 
@@ -609,6 +610,35 @@ int novas_set_split_time(enum novas_timescale timescale, long ijd, double fjd, i
   time->ut1_to_tt -= dt;
 
   return 0;
+}
+
+/**
+ * Returns the time difference between two different timescales at a specific astrometric time
+ * instance.
+ *
+ * @param ts          astrometric time
+ * @param timescale   a timescale
+ * @param ref_scale   the reference timescale
+ * @return            [s] the time difference between the time expressed in the first timescale vs
+ *                    that in the reference timescale, or else NAN if either timescale parameter
+ *                    is invalid.
+ *
+ * @since 1.6
+ * @author Attila Kovacs
+ */
+double novas_timescale_offset(const novas_timespec *ts, enum novas_timescale timescale, enum novas_timescale ref_scale) {
+  static const char *fn = "novas_timescale_offset";
+
+  if(!ts) {
+    novas_set_errno(EINVAL, fn, "input time specification is NULL");
+    return NAN;
+  }
+
+  errno = 0;
+  double dt = tt_offset(ts, timescale) - tt_offset(ts, ref_scale);
+  if(errno)
+    novas_trace_nan(fn);
+  return dt;
 }
 
 /**
@@ -717,35 +747,10 @@ double novas_get_split_time(const novas_timespec *restrict time, enum novas_time
 
   f = time->fjd_tt;
 
-  switch(timescale) {
-    case NOVAS_TT:
-      break;
-    case NOVAS_TDB:
-      f += time->tt2tdb / DAY;
-      break;
-    case NOVAS_TCB:
-      f += time->tt2tdb / DAY - TC_TDB0;
-      f += TC_LB * ((time->ijd_tt - TC_T0) + f);
-      break;
-    case NOVAS_TCG:
-      f += TC_LG * ((time->ijd_tt - TC_T0) + f);
-      break;
-    case NOVAS_TAI:
-      f -= DTA;
-      break;
-    case NOVAS_GPS:
-      f -= (DTA + GPS2TAI);
-      break;
-    case NOVAS_UTC:
-      f -= (time->ut1_to_tt + time->dut1) / DAY;
-      break;
-    case NOVAS_UT1:
-      f -= time->ut1_to_tt / DAY;
-      break;
-    default:
-      novas_set_errno(EINVAL, fn, "Invalid timescale: %d", timescale);
-      return NAN;
-  }
+  errno = 0;
+  f += tt_offset(time, timescale) / DAY;
+  if(errno)
+    novas_trace_nan(fn);
 
   if(f < 0.0) {
     f += 1.0;
@@ -1333,7 +1338,7 @@ double novas_time_lst(const novas_timespec *restrict time, double lon, enum nova
 int novas_time_leap(const novas_timespec *time) {
   if(!time)
     return novas_error(-1, EINVAL, "novas_time_leap", "input time specification is NULL");
-  return (int) round(time->ut1_to_tt + time->dut1 - DTA_SECONDS);
+  return (int) round(time->ut1_to_tt + time->dut1 - DTA);
 }
 
 

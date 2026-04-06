@@ -535,6 +535,22 @@ Interval Time::dUT1() const {
 }
 
 /**
+ * Returns the time difference between two timescales at this specific time instance.
+ *
+ * @param timescale   a timescale
+ * @param ref_scale   (optional) the reference timescale (default: TT).
+ * @return            The difference in the time expressed in the specified timescale vs the
+ *                    reference timescale.
+ */
+Interval Time::timescale_offset(enum novas_timescale timescale, enum novas_timescale ref_scale) const {
+  static const char *fn = "Time::timescale_offset()";
+  Interval dt(novas_timescale_offset(&_ts, timescale, ref_scale));
+  if(!dt.is_valid())
+    novas_trace_invalid(fn);
+  return dt;
+}
+
+/**
  * Returns the Julian coordinate epoch year of this time instance.
  *
  * @return      [yr] the Julian coordinate epoch (e.g. 2000.0 for J2000).

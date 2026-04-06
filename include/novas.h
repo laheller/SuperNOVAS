@@ -3342,12 +3342,17 @@ int novas_itrs_to_enu(const double *itrf, double lon, double lat, double *enu);
 /// @c_observer
 int novas_enu_to_itrs(const double *enu, double lon, double lat, double *itrf);
 
+// in timescale.c
+/// @c_time
+int novas_time_leap(const novas_timespec *time);
+
 /// @c_time
 double novas_diff_time_scale(const novas_timespec *t1, const novas_timespec *t2, enum novas_timescale scale);
 
 /// @c_time
-int novas_time_leap(const novas_timespec *time);
+double novas_timescale_offset(const novas_timespec *ts, enum novas_timescale timescale, enum novas_timescale ref_scale);
 
+// in moon.c
 /// @c_geometric
 int novas_moon_elp_posvel(const novas_frame *restrict frame, enum novas_reference_system sys, double *restrict pos, double *restrict vel);
 

@@ -1732,6 +1732,8 @@ public:
 
   double mjd_frac(enum novas_timescale timescale = NOVAS_TT) const;
 
+  Interval timescale_offset(enum novas_timescale timescale, enum novas_timescale ref_scale = NOVAS_TT) const;
+
   time_t unix_time(long *nanos = NULL) const;
 
   int leap_seconds() const;

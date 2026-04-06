@@ -5163,6 +5163,19 @@ static int test_site_uvw() {
   return n;
 }
 
+static int test_timescale_diff() {
+  int n = 0;
+
+  novas_timespec ts = {};
+  novas_set_time(NOVAS_TT, NOVAS_JD_J2000, 32, 0.0, &ts);
+
+  if(!is_equal("timescale_diff:tai-tt", novas_timescale_offset(&ts, NOVAS_TAI, NOVAS_TT), -32.184, 1e-12)) n++;
+  if(!is_equal("timescale_diff:tai-gps", novas_timescale_offset(&ts, NOVAS_TAI, NOVAS_GPS), 19.0, 1e-12)) n++;
+  if(!is_equal("timescale_diff:utc-tt", novas_timescale_offset(&ts, NOVAS_UTC, NOVAS_TT), -64.184, 1e-12)) n++;
+
+  return n;
+}
+
 int main(int argc, char *argv[]) {
   int n = 0;
 
@@ -5331,6 +5344,7 @@ int main(int argc, char *argv[]) {
 
   if(test_uvw()) n++;
   if(test_site_uvw()) n++;
+  if(test_timescale_diff()) n++;
 
   n += test_dates();
 

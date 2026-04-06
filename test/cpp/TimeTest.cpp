@@ -49,6 +49,7 @@ int main() {
   if(!test.check("invalid moon_phase()", !x.moon_phase().is_valid())) n++;
   if(!test.check("invalid moon_phase()", !x.next_moon_phase(Angle(0.0)).is_valid())) n++;
   if(!test.check("invalid to_calendar_date()", !x.to_calendar_date().is_valid())) n++;
+  if(!test.check("invalid timescale_diff()", !x.timescale_offset(NOVAS_UTC).is_valid())) n++;
   if(!test.equals("invalid to_string()", x.to_string(), "<invalid time>")) n++;
   if(!test.equals("invalid to_iso_string()", x.to_iso_string(), "<invalid time>")) n++;
   if(!test.equals("invalid to_epoch_string()", x.to_epoch_string(), "<invalid epoch>")) n++;
@@ -64,6 +65,9 @@ int main() {
   if(!test.equals("jd_frac(UTC)", (a + 1e-9).jd_frac(NOVAS_UTC), 0.0, 1e-8)) n++;
   if(!test.equals("mjd_day(UTC)", a.mjd_day(NOVAS_UTC), (long) (NOVAS_JD_J2000 - NOVAS_JD_MJD0))) n++;
   if(!test.equals("mjd_frac(UTC)", a.mjd_frac(NOVAS_UTC), 0.5, 1e-8)) n++;
+  if(!test.equals("timescale_diff(UTC)", a.timescale_offset(NOVAS_UTC).seconds(), novas_timescale_offset(a._novas_timespec(), NOVAS_UTC, NOVAS_TT))) n++;
+  if(!test.check("timescale_offset(invalid scale)", !a.timescale_offset((enum novas_timescale) -1).is_valid())) n++;
+  if(!test.check("timescale_offset(invalid ref)", !a.timescale_offset(NOVAS_UTC, (enum novas_timescale) -1).is_valid())) n++;
   if(!test.equals("time_of_day(UTC)", a.time_of_day(NOVAS_UTC).hours(), 12.0, 1e-7)) n++;
   if(!test.equals("day_of_week(UTC)", a.day_of_week(NOVAS_UTC), novas_day_of_week(a.jd(NOVAS_UTC)), 1e-7)) n++;
   if(!test.equals("moon_phase()", a.moon_phase().deg(), novas_moon_phase(a.jd(NOVAS_TDB)), 1e-9)) n++;
