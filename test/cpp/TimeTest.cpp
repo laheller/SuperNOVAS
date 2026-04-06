@@ -77,6 +77,7 @@ int main() {
   if(!test.check("operator-(invalid time)", !(a - x).is_valid())) n++;
   if(!test.check("invalid.operator-(Time&)", !(x - a).is_valid())) n++;
 
+  if(!test.check("jd(timescale invalid)", isnan(a.jd((enum novas_timescale) -1)))) n++;
   if(!test.equals("jd_day(timescale invalid)", !a.jd_day((enum novas_timescale) -1), 0)) n++;
   if(!test.equals("mjd_day(timescale invalid)", !a.mjd_day((enum novas_timescale) -1), 0)) n++;
   if(!test.check("jd_frac(timescale invalid)", isnan(a.jd_frac((enum novas_timescale) -1)))) n++;

@@ -123,7 +123,7 @@ int main(int argc, const char *argv[]) {
 
   // -------------------------------------------------------------------------
   // Print source name to output
-  std::cout << source.to_string() << "observed from " << obs.site().to_string() << ":\n";
+  std::cout << source.to_string() << " observed from\n   " << obs.site().to_string() << ":\n";
 
 
   // -------------------------------------------------------------------------
@@ -139,10 +139,10 @@ int main(int argc, const char *argv[]) {
   Time t_rise = source.rises_above(el, frame, novas_optical_refraction, weather);
 
   if(!t_rise) {
-    std::cout << " will not rise above " << el.to_string() << " degrees\n";
+    std::cout << " will not rise above " << el.deg() << " degrees\n";
   }
   else {
-    std::cout << " will rise above " << el.to_string() << " degrees at  : " << t_rise.to_string() << "\n";
+    std::cout << " will rise above " << el.deg() << " degrees at  : " << t_rise.to_string() << "\n";
   }
 
 
@@ -150,7 +150,7 @@ int main(int argc, const char *argv[]) {
   // Calculate next UTC-based date/time source transits at observer location
   Time t_transit = source.transits_in(frame);
 
-  std::cout << " will transit at                   : " << t_transit.to_string() << "\n";
+  std::cout << " will transit at               : " << t_transit.to_string() << "\n";
 
 
   // -------------------------------------------------------------------------
@@ -159,10 +159,10 @@ int main(int argc, const char *argv[]) {
   Time t_set = source.sets_below(el, frame, novas_optical_refraction, weather);
 
   if(!t_set) {
-    std::cout << " will not set below " << el.to_string() << " degrees\n";
+    std::cout << " will not set below " << el.deg() << " degrees\n";
   }
   else {
-    std::cout << " will set below " << el.to_string() << " degrees at  : " << t_set.to_string() << "\n";
+    std::cout << " will set below  " << el.deg() << " degrees at  : " << t_set.to_string() << "\n";
   }
 
 

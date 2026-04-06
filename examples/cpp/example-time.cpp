@@ -43,6 +43,7 @@ int main() {
   // (It could also be TAI, or GPS, or TDB...)
   Time time1("2025-01-29T18:09:29.333+0200", eop, NOVAS_UTC);
 
+  std::cout << "Time 1 is " << time1.to_string() << "\n";
 
   // -------------------------------------------------------------------------
   // 1.b. Dates from strings more generally...
@@ -81,6 +82,7 @@ int main() {
   //   GPS, or TDB...)
   Time time2 = date2.to_time(LEAP_SECONDS, DUT1, NOVAS_TAI);
 
+  std::cout << "Time 2 is " << time1.to_string() << "\n";
 
   // -------------------------------------------------------------------------
   // 1.d. UNIX time
@@ -117,19 +119,11 @@ int main() {
   std::cout << "Split TDB date is " << ijd << " / " << fjd << "\n";
 
 
-
   // -------------------------------------------------------------------------
   // 3. Measure time difference
 
-  // - Difference in Earth-based time measures (UTC, GPS, TAI, TT)
-  Interval dt = time1 - time2;
-  std::cout << " UTC Time difference is " << dt.to_string() << "\n";
-
-  // - Difference in TCG -- time progresses differently outside of Earth gravity
-  std::cout << " TCG Time difference is " << time1.offset_from(time2, NOVAS_TCG).to_string() << "\n";
-
-  // - Difference in TCB -- time progresses differently outside of Earth gravity
-  std::cout << " TCB Time difference is " << time1.offset_from(time2, NOVAS_TCB).to_string() << "\n";
+  // - Difference in UTC.
+  std::cout << "UTC time difference is " << time1.offset_from(time2, NOVAS_UTC).to_string() << "\n";
 
   // -------------------------------------------------------------------------
   // 4. Offset time
@@ -142,10 +136,10 @@ int main() {
   // 5. Print time
 
   // - Print an UTC-based ISO timestamp to a string
-  std::cout << " Offset time is: " << time1.to_iso_string() << "\n";
+  std::cout << "Offset time is: " << time1.to_iso_string() << "\n";
 
   // - Print a timestamp in a specific time measure, e.g. GPS time
-  std::cout << " in TDB        : " << time1.to_string(NOVAS_TDB) <<"\n";
+  std::cout << " in TDB       : " << time1.to_string(NOVAS_TDB) <<"\n";
 
 
   // -------------------------------------------------------------------------

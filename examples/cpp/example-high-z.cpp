@@ -114,12 +114,14 @@ int main() {
   // (mas) precisions only...
   auto frame = obs.frame_at(t, accuracy);
 
+
   // -------------------------------------------------------------------------
   // Calculate the precise apparent position.
   Apparent apparent = source.apparent_in(frame);
 
   // Let's print the apparent position
   std::cout << apparent.to_string() << "\n";
+
 
   // -------------------------------------------------------------------------
   // Convert the apparent position on sky to horizontal coordinates

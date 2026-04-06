@@ -663,8 +663,6 @@ int novas_offset_time(const novas_timespec *time, double seconds, novas_timespec
 double novas_get_time(const novas_timespec *restrict time, enum novas_timescale timescale) {
   long ijd;
   double fjd = novas_get_split_time(time, timescale, &ijd);
-  if(isnan(fjd))
-    return novas_trace_nan("novas_get_time");
   return ijd + fjd;
 }
 

@@ -407,7 +407,10 @@ const novas_timespec * Time::_novas_timespec() const {
  * @sa jd_day(), mjd()
  */
 double Time::jd(enum novas_timescale timescale) const {
-  return novas_check_nan("Time::jd", novas_get_time(&_ts, timescale));
+  double jd = novas_get_time(&_ts, timescale);
+  if((unsigned) timescale >= NOVAS_TIMESCALES)
+    novas_trace_invalid("Time::jd()");
+  return jd;
 }
 
 /**

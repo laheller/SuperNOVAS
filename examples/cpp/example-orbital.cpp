@@ -142,7 +142,7 @@ int main() {
 
   // Let's print the apparent position
   std::cout << "Ceres    : \n";
-  std::cout << "  apparent  : " << apparent.to_string() << "\n";
+  std::cout << "    " << apparent.to_string() << "\n";
 
 
   // -------------------------------------------------------------------------
@@ -156,7 +156,7 @@ int main() {
   // Calculate refracted horizontal coordinates
   Horizontal hor = apparent.to_horizontal().to_refracted(novas_optical_refraction, weather);
 
-  std::cout << "  horizontal: " << hor.to_string() << "\n";
+  std::cout << "    " << hor.to_string() << "\n";
 
 
   // -------------------------------------------------------------------------

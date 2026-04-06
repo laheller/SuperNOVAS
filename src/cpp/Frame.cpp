@@ -216,7 +216,10 @@ double Frame::jd(enum novas_timescale timescale) const {
  * @sa novas_clock_skew()
  */
 double Frame::clock_skew(enum novas_timescale timescale) const {
-  return novas_check_nan("Frame::clock_skew", novas_clock_skew(&_frame, timescale));
+  double D = novas_clock_skew(&_frame, timescale);
+  if((unsigned) timescale >= NOVAS_TIMESCALES)
+    novas_trace_invalid("Frame::clock_skew");
+  return D;
 }
 
 /**
