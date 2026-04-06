@@ -28,8 +28,8 @@ static bool is_valid_sky_pos(const char *fn, const sky_pos *p) {
   if(!isfinite(p->rv))
     novas_set_errno(EINVAL, fn, "input radial velocity is NAN or infinite");
 
-  if(p->rv * Unit::au / Unit::day > Constant::c)
-    novas_set_errno(EINVAL, fn, "input radial velocity exceeds the speed of light: %g m/s", p->rv * Unit::au / Unit::day);
+  if(p->rv * Unit::km / Unit::s > Constant::c)
+    novas_set_errno(EINVAL, fn, "input radial velocity exceeds the speed of light: %g m/s", p->rv * Unit::km / Unit::s);
 
   return (errno == 0);
 }

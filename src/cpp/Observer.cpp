@@ -19,7 +19,6 @@ namespace supernovas {
 
 Observer::Observer() : Observer((enum novas_observer_place) -1, Site::undefined(), Position::undefined(), Velocity::undefined()) {}
 
-
 Observer::Observer(enum novas_observer_place type, const Site& site, const Position& pos,
         const Velocity& vel) {
   _observer.where = type;
@@ -567,7 +566,6 @@ std::string SolarSystemObserver::to_string() const {
   return "SolarSystemObserver at " + p + v;
 }
 
-
 /**
  * Instantiates a new observer at a fixed location on Earth.
  *
@@ -663,8 +661,9 @@ const Observer *GeodeticObserver::copy() const {
   return new GeodeticObserver(*this);
 }
 
-
-bool GeodeticObserver::is_geodetic() const { return true; }
+bool GeodeticObserver::is_geodetic() const {
+  return true;
+}
 
 /**
  * Returns the fixed or momentary observing site for this observer.
@@ -688,7 +687,7 @@ Site GeodeticObserver::site() const {
  *
  * @return    the momentary ITRS surface velocity vector of the moving observer.
  *
- * @sa Site::itrs_to_enu()
+ * @sa enu_velocity(), Site::itrs_to_enu()
  */
 Velocity GeodeticObserver::itrs_velocity() const {
   Velocity vel(_observer.near_earth.sc_vel, Unit::km / Unit::s);
@@ -697,7 +696,6 @@ Velocity GeodeticObserver::itrs_velocity() const {
   return vel;
 }
 
-
 /**
  * Returns the surface velocity, in the local East-North-Up (ENU) directions, of a moving observer,
  * such as an airborne or balloon-borne observatory.
@@ -705,7 +703,7 @@ Velocity GeodeticObserver::itrs_velocity() const {
  * @return    the momentary surface velocity vector of the moving observer in the East-North-Up
  *            (ENU) directions at the current location.
  *
- * @sa Site::itrs_to_enu()
+ * @sa itrs_velocity(), Site::itrs_to_enu()
  */
 Velocity GeodeticObserver::enu_velocity() const {
   double v[3] = {0.0};
@@ -796,7 +794,6 @@ EOP GeodeticObserver::eop_at(const Time& time) const {
   return EOP(time.leap_seconds(), time.dUT1().seconds() + dut, m.xp().rad() + dx * Unit::arcsec, m.yp().rad() + dy * Unit::arcsec);
 }
 
-
 /**
  * Returns a string representation of this Earth-based observer location.
  *
@@ -804,12 +801,9 @@ EOP GeodeticObserver::eop_at(const Time& time) const {
  */
 std::string GeodeticObserver::to_string() const {
   Velocity vel = enu_velocity();
-
   std::string v = (vel.is_zero()) ? "" : " moving at ENU " + vel.to_string();
-
   return "GeodeticObserver at " + site().to_string() + v;
 }
-
 
 } // namespace supernovas
 
