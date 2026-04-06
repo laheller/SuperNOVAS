@@ -574,7 +574,6 @@ static double tt_offset(const novas_timespec *ts, enum novas_timescale timescale
  */
 int novas_set_split_time(enum novas_timescale timescale, long ijd, double fjd, int leap, double dut1,
         novas_timespec *restrict time) {
-  static const char *fn = "novas_set_split_time";
 
   long ifjd;
   double dt = 0.0;
@@ -594,7 +593,7 @@ int novas_set_split_time(enum novas_timescale timescale, long ijd, double fjd, i
   errno = 0;
   fjd -= tt_offset(time, timescale) / DAY;
   if(errno)
-    return novas_trace(fn, -1, 0);
+    return novas_trace("novas_set_split_time", -1, 0);
 
   ifjd = (long) floor(fjd);
 

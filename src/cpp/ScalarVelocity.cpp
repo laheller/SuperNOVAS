@@ -89,6 +89,7 @@ bool ScalarVelocity::equals(const ScalarVelocity& speed, double tolerance) const
  *
  * @sa operator==(), operator!=()
  */
+// cppcheck-suppress functionStatic
 bool ScalarVelocity::equals(const ScalarVelocity& speed, const ScalarVelocity& tolerance) const {
   return equals(speed, tolerance.m_per_s());
 }

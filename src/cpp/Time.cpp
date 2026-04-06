@@ -543,10 +543,9 @@ Interval Time::dUT1() const {
  *                    reference timescale.
  */
 Interval Time::timescale_offset(enum novas_timescale timescale, enum novas_timescale ref_scale) const {
-  static const char *fn = "Time::timescale_offset()";
   Interval dt(novas_timescale_offset(&_ts, timescale, ref_scale));
   if(!dt.is_valid())
-    novas_trace_invalid(fn);
+    novas_trace_invalid("Time::timescale_offset()");
   return dt;
 }
 
