@@ -11,11 +11,6 @@
 #define NOVAS_CSPICE_H_
 
 #if __cplusplus
-
-#  ifdef NOVAS_NAMESPACE
-namespace novas {
-#  endif
-
 extern "C" {
 #endif
 
@@ -37,12 +32,12 @@ int cspice_add_kernel(const char *filename);
 /// @ingroup solar-system
 int cspice_remove_kernel(const char *filename);
 
+// ----------------- Added in v1.6.0 --------------------
+/// @ingroup solar-system
+int cspice_clear_kernels();
+
 #if __cplusplus
 } // extern "C"
-
-#  ifdef NOVAS_NAMESPACE
-} // namespace novas
-#  endif
 #endif
 
 #endif /* NOVAS_CSPICE_H_ */

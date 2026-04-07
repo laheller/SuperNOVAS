@@ -12,48 +12,39 @@ include config.mk
 # Specific build targets and recipes below...
 # ===============================================================================
 
-# We'll need math functions to link
-LDFLAGS += -lm
-
-# If there is doxygen, build the API documentation also by default
-ifeq ($(.SHELLSTATUS),0)
-  DOC_TARGETS += local-dox
-else
-  ifneq ($(DOXYGEN),none)
-    $(info WARNING! Doxygen is not available. Will skip 'dox' target)
-  endif
-endif
-
-SOLSYS_TARGETS :=
-SHARED_TARGETS := $(LIB)/libsupernovas.$(SOEXT) $(LIB)/libnovas.$(SOEXT)
-
-ifeq ($(CALCEPH_SUPPORT), 1)
-  CPPFLAGS += -DUSE_CALCEPH=1
-  SOLSYS_TARGETS += $(OBJ)/solsys-calceph.o
-  SHARED_TARGETS += $(LIB)/libsolsys-calceph.$(SOEXT)
-endif
-
-ifeq ($(CSPICE_SUPPORT), 1)
-  CPPFLAGS += -DUSE_CSPICE=1
-  SOLSYS_TARGETS += $(OBJ)/solsys-cspice.o
-  SHARED_TARGETS += $(LIB)/libsolsys-cspice.$(SOEXT)
-endif
-
 # Default target for packaging with Linux distributions
 .PHONY: distro
-distro: $(SHARED_TARGETS) $(DOC_TARGETS)
+distro: shared $(DOC_TARGETS)
 
-# Shared libraries (versioned and unversioned)
-.PHONY: shared
-shared: summary $(SHARED_TARGETS)
+# Shared or static libraries (versioned and unversioned)
+.PHONY: shared static analyze
+shared static: summary
+	$(MAKE) -C src $@
 
-# Static libraries
-.PHONY: static
-static: summary $(LIB)/libnovas.a solsys
+.PHONY: shared-c99
+shared-c99: summary
+	$(MAKE) -C src/c99 shared
 
-# solarsystem() call handler objects
+.PHONY: shared-cpp
+shared-cpp: summary
+	$(MAKE) -C src/cpp shared
+
+.PHONY: static-c99
+static-c99: summary
+	$(MAKE) -C src/c99 static
+
+.PHONY: static-cpp
+static-cpp: summary
+	$(MAKE) -C src/cpp static
+
 .PHONY: solsys
-solsys: $(SOLSYS_TARGETS)
+solsys:
+	$(MAKE) -C src/c99 solsys
+
+# Static analysis
+.PHONY: analyze
+analyze:
+	$(MAKE) -C src $@
 
 # All of the above
 .PHONY: all
@@ -65,7 +56,7 @@ test:
 	$(MAKE) -C test run
 
 .PHONY: benchmark
-benchmark: shared
+benchmark: shared-c99
 	$(MAKE) -C benchmark
 
 .PHONY: examples
@@ -85,6 +76,7 @@ coverage:
 .PHONY: clean
 clean:
 	@rm -f $(OBJECTS) Doxyfile.local gmon.out
+	@$(MAKE) -s -C src clean
 	@$(MAKE) -s -C test clean
 	@$(MAKE) -s -C benchmark clean
 	@$(MAKE) -s -C examples clean
@@ -97,53 +89,23 @@ distclean: clean
       $(LIB)/libnovas.$(SOEXT)* $(LIB)/libsolsys*.$(SOEXT)*
 	@rm -f doc/Doxyfile.local doc/README.md
 	@rm -rf build */build 
+	@$(MAKE) -s -C src distclean
 	@$(MAKE) -s -C test distclean
 	@$(MAKE) -s -C benchmark distclean
 	@$(MAKE) -s -C examples distclean
 	@$(MAKE) -s -C doc distclean
 
-.PHONY: dox
-dox:
-	DOXYGEN_HTML_HEADER="resources/header.html" $(MAKE) -C doc
 
-.PHONY: local-dox
-local-dox:
+.PHONY: dox local-dox
+dox local-dox:
 	$(MAKE) -C doc
 
 
 # ----------------------------------------------------------------------------
-# The nitty-gritty stuff below
+# Install targets and recipes
 # ----------------------------------------------------------------------------
 
-$(LIB)/libsupernovas.$(SOEXT): $(LIB)/libsupernovas.$(SOEXT).$(SO_VERSION)
-
-$(LIB)/libsolsys-calceph.$(SOEXT): $(LIB)/libsolsys-calceph.$(SOEXT).$(SO_VERSION)
-
-$(LIB)/libsolsys-cspice.$(SOEXT): $(LIB)/libsolsys-cspice.$(SOEXT).$(SO_VERSION)
-
-$(LIB)/libnovas.$(SOEXT): $(LIB)/libsupernovas.$(SOEXT)
-
-# Shared library: libsupernovas.so.1 -- same as novas.so except the builtin SONAME
-$(LIB)/libsupernovas.$(SOEXT).$(SO_VERSION): $(SOURCES)
-
-# Shared library: libsolsys-calceph.so.1 (standalone solsys2.c functionality)
-$(LIB)/libsolsys-calceph.$(SOEXT).$(SO_VERSION): SHLIBS := -lcalceph -lpthread
-$(LIB)/libsolsys-calceph.$(SOEXT).$(SO_VERSION): $(SRC)/solsys-calceph.c
-
-# Shared library: libsolsys-cspice.so.1 (standalone solsys2.c functionality)
-$(LIB)/libsolsys-cspice.$(SOEXT).$(SO_VERSION): SHLIBS := -lcspice -lpthread
-$(LIB)/libsolsys-cspice.$(SOEXT).$(SO_VERSION): $(SRC)/solsys-cspice.c
-
-# Link submodules against the supernovas shared lib
-$(LIB)/libsolsys%.$(SOEXT).$(SO_VERSION): | $(LIB) $(LIB)/libsupernovas.$(SOEXT).$(SO_VERSION)
-	$(CC) -o $@ $(CPPFLAGS) $(CFLAGS) $^ $(SHARED_FLAGS) $(SONAME_FLAG)$(notdir $@) -L$(LIB) -lsupernovas $(SHLIBS) $(LDFLAGS)
-
-# Static library: libsupernovas.a
-$(LIB)/libsupernovas.a: $(OBJECTS) | $(LIB) Makefile
-
-$(LIB)/libnovas.a: $(LIB)/libsupernovas.a
-	@rm -f $@
-	( cd $(LIB); ln -s libsupernovas.a libnovas.a )
+LIB ?= lib
 
 # Standard install commands
 INSTALL_PROGRAM ?= install
@@ -179,6 +141,9 @@ install-headers:
 	@echo "installing headers to $(DESTDIR)$(includedir)"
 	install -d $(DESTDIR)$(includedir)
 	$(INSTALL_DATA) include/novas.h $(DESTDIR)$(includedir)/
+ifeq ($(ENABLE_CPP),1)
+	$(INSTALL_DATA) include/supernovas.h $(DESTDIR)$(includedir)/
+endif
 	@$(MAKE) install-calceph-headers
 	@$(MAKE) install-cspice-headers
 
@@ -187,31 +152,46 @@ install-docs: install-markdown install-html install-examples install-legacy
 
 .PHONY: install-markdown
 install-markdown:
-	@echo "installing documentation to $(DESTDIR)$(docdir)"
+	@echo "installing Markdown documentation to $(DESTDIR)$(docdir)"
 	install -d $(DESTDIR)$(docdir)
-	$(INSTALL_DATA) doc/*.md $(DESTDIR)$(docdir)/
 	$(INSTALL_DATA) CHANGELOG.md $(DESTDIR)$(docdir)/
 	$(INSTALL_DATA) CONTRIBUTING.md $(DESTDIR)$(docdir)/
 
 .PHONY: install-html
 install-html:
-ifneq ($(wildcard doc/html/search/*),)
-	@echo "installing API documentation to $(DESTDIR)$(htmldir)"
-	install -d $(DESTDIR)$(htmldir)/search
-	$(INSTALL_DATA) doc/html/search/* $(DESTDIR)$(htmldir)/search/
-	$(INSTALL_DATA) doc/html/*.* $(DESTDIR)$(htmldir)/
-	@echo "installing Doxygen tag file to $(DESTDIR)$(docdir)"
+ifneq ($(wildcard doc/c99/html/search/*),)
+	@echo "installing C99 API documentation to $(DESTDIR)$(htmldir)/c99"
+	install -d $(DESTDIR)$(htmldir)/c99/search
+	$(INSTALL_DATA) doc/c99/html/search/* $(DESTDIR)$(htmldir)/c99/search/
+	$(INSTALL_DATA) doc/c99/html/*.* $(DESTDIR)$(htmldir)/c99/
+	@echo "installing C99 Doxygen tag file to $(DESTDIR)$(docdir)"
 	install -d $(DESTDIR)$(docdir)
-	$(INSTALL_DATA) doc/supernovas.tag $(DESTDIR)$(docdir)/supernovas.tag
+	$(INSTALL_DATA) doc/supernovas.tag $(DESTDIR)$(docdir)/
 else
-	@echo "WARNING! Skipping HTML docs install: needs doxygen and 'local-dox'"
+	@echo "WARNING! Skipping C99 HTML docs install: needs doxygen and 'local-dox'"
+endif
+ifneq ($(wildcard doc/cpp/html/search/*),)
+	@echo "installing C++ API documentation to $(DESTDIR)$(htmldir)/cpp"
+	install -d $(DESTDIR)$(htmldir)/cpp/search
+	$(INSTALL_DATA) doc/cpp/html/search/* $(DESTDIR)$(htmldir)/cpp/search/
+	$(INSTALL_DATA) doc/cpp/html/*.* $(DESTDIR)$(htmldir)/cpp/
+	@echo "installing C++ Doxygen tag file to $(DESTDIR)$(docdir)"
+	install -d $(DESTDIR)$(docdir)
+	$(INSTALL_DATA) doc/cpp/supernovas++.tag $(DESTDIR)$(docdir)/
+else
+	@echo "WARNING! Skipping C++ HTML docs install: needs doxygen and 'local-dox'"
 endif
 
 .PHONY: install-examples
 install-examples:
-	@echo "installing examples to $(DESTDIR)$(docdir)/examples"
-	install -d $(DESTDIR)$(docdir)/examples
-	$(INSTALL_DATA) examples/* $(DESTDIR)$(docdir)/examples/
+	@echo "installing C99 examples to $(DESTDIR)$(docdir)/examples/c99"
+	install -d $(DESTDIR)$(docdir)/examples/c99
+	$(INSTALL_DATA) examples/c99/* $(DESTDIR)$(docdir)/examples/c99/
+ifeq ($(ENABLE_CPP),1)
+	@echo "installing C++ examples to $(DESTDIR)$(docdir)/examples/cpp"
+	install -d $(DESTDIR)$(docdir)/examples/cpp
+	$(INSTALL_DATA) examples/cpp/* $(DESTDIR)$(docdir)/examples/cpp/
+endif
 
 .PHONY: install-legacy
 install-legacy:
@@ -232,6 +212,11 @@ ps:
 .PHONY: pdf
 pdf:
 
+
+# ----------------------------------------------------------------------------
+# Help and info targets
+# ----------------------------------------------------------------------------
+
 # Build configuration summary
 .PHONY: summary
 summary:
@@ -240,6 +225,7 @@ summary:
 	@echo
 	@echo "    CALCEPH_SUPPORT      = $(CALCEPH_SUPPORT)"
 	@echo "    CSPICE_SUPPORT       = $(CSPICE_SUPPORT)"
+	@echo "    ENABLE_CPP           = $(ENABLE_CPP)"
 	@echo "    SOLSYS_SOURCES       = $(SOLSYS_SOURCES)"
 	@echo "    READEPH_SOURCES      = $(READEPH_SOURCES)"
 	@echo
@@ -259,12 +245,10 @@ help:
 	@echo "  distro        (default) 'shared' targets and also 'local-dox' provided 'doxygen'" 
 	@echo "                is available, or was specified via the DOXYGEN variable (e.g. in"
 	@echo "                'config.mk')"
-	@echo "  static        Builds the static 'lib/libsupernovas.a' library."
-	@echo "  shared        Builds the shared 'libsupernovas.so', 'libsolsys1.so', and" 
+	@echo "  static        Builds the static 'lib/libsupernovas[++].a' libraries."
+	@echo "  shared        Builds the shared 'libsupernovas[++].so', 'libsolsys1.so', and" 
 	@echo "                'libsolsys2.so' libraries (linked to versioned ones)."
-	@echo "  local-dox     Compiles local HTML API documentation using 'doxygen'."
-	@echo "  solsys        Builds only the objects that may provide external 'solarsystem()'"
-	@echo "                call implentations (e.g. 'solsys1.o', 'eph_manager.o'...)."
+	@echo "  dox           Compiles HTML API documentation using 'doxygen'."
 	@echo "  test          Runs regression tests."
 	@echo "  benchmark     Runs benchmarks."
 	@echo "  analyze       Performs static code analysis with 'cppcheck'."
@@ -279,9 +263,3 @@ help:
 
 # This Makefile depends on the config and build snipplets.
 Makefile: config.mk build.mk
-
-# ===============================================================================
-# Generic targets and recipes below...
-# ===============================================================================
-
-include build.mk

@@ -4,36 +4,43 @@
 #
 # Author: Attila Kovacs
 
-# Check if there is a doxygen we can run
-ifndef DOXYGEN
-  DOXYGEN := $(shell which doxygen)
-else
-  $(shell test -f $(DOXYGEN))
-endif
-
 CC ?= gcc
 
-# Doxygen documentation (HTML and man pages) under apidocs/
+# Doxygen documentation (HTML and man pages) under docs/
 .PHONY: all
-all: Doxyfile README.md $(SRC) $(INC)
-	@echo "   [doxygen]"
-	@$(DOXYGEN) Doxyfile
+all: README.md
+	@$(MAKE) -C c99 all
+	@$(MAKE) -C cpp all
 
 .INTERMEDIATE: docedit
 docedit: src/docedit.o
 	$(CC) -o $@ $^
 
 # Generate headless and undecorated README variants
-README.md: ../README.md docedit
+README.md README-undecorated.md: ../README.md docedit
 	@echo "   [README variants]"
 	@./docedit
 
 .PHONY: clean
 clean:
-	rm -f docedit *.tag
+	rm -f docedit src/docedit.o
+	@$(MAKE) -C c99 clean
+	@$(MAKE) -C cpp clean
 
 .PHONY: distclean
 distclean: clean
-	rm -rf README*.md html
+	rm -rf README*.md
+	@$(MAKE) -C c99 distclean
+	@$(MAKE) -C cpp distclean
 
-
+.PHONY: help
+help:
+	@echo
+	@echo "Syntax: make [target]"
+	@echo
+	@echo "The following targets are available:"
+	@echo
+	@echo "  all           (default) Build HTML documentation."
+	@echo "  clean         Removes intermediate products."
+	@echo "  distclean     Deletes all generated files."
+	@echo

@@ -1,45 +1,23 @@
 # Part of SuperNOVAS
 #
-# Build exammple programs
+# Build the example programs of the SuperNOVAS library 
 #
 # Author: Attila Kovacs
 
-# Use the definitions project definitions
 include ../config.mk
 
-EXAMPLES = example-star example-high-z example-orbital example-time example-rise-set
-
-CPPFLAGS += -I../include
-LDFLAGS += -L../$(LIB) -lsupernovas
-
-ifeq ($(CALCEPH_SUPPORT),1)
-  EXAMPLES += example-calceph
-  LDFLAGS += -lsolsys-calceph -lcalceph
+.PHONY: all analyze 
+all analyze:
+	@$(MAKE) -C c99 $@
+ifeq ($(ENABLE_CPP),1)
+	@$(MAKE) -C cpp $@
 endif
 
-ifeq ($(CSPICE_SUPPORT),1)
-  EXAMPLES += example-cspice
-  LDFLAGS += -lsolsys-cspice -lcspice
-endif
+.PHONY: clean distclean
+clean distclean:
+	@$(MAKE) -C c99 $@
+	@$(MAKE) -C cpp $@
 
-.PHONY: all
-all: $(EXAMPLES)
-
-# Static code analysis using 'cppcheck'
-.PHONY: analyze
-analyze:
-	@echo "   [analyze]"
-	@cppcheck $(CPPFLAGS) $(CHECKOPTS) .
-
-.PHONY: clean
-clean:
-
-.PHONY: distclean
-distclean:
-	rm -f $(EXAMPLES)
-
-example-%: example-%.c
-	$(CC) -o $@ $(CPPFLAGS) $(CFLAGS) $< $(LDFLAGS)
 
 .PHONY: help
 help:
@@ -53,4 +31,3 @@ help:
 	@echo "  clean         Removes intermediate products."
 	@echo "  distclean     Deletes all generated files."
 	@echo
-

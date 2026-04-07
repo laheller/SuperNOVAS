@@ -42,7 +42,7 @@ static void replace(const char *str, const char *from, const char *to) {
   lto = strlen(to);
   lrem = strlen(match + lfrom);
 
-  memmove(match + lto, match + lfrom, lrem);
+  memmove(match + lto, match + lfrom, lrem + 1);
   memcpy(match, to, lto);
   match[lrem] = '\0';
 }
@@ -78,6 +78,9 @@ static int make_headless_readme() {
       head = 0;
       continue;
     }
+
+    // Remove 'doc/' prefix from internal links
+    replace(line, "\"doc/", "\"");
 
     fwrite(line, strlen(line), 1, out);
   }

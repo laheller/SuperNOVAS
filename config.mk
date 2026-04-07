@@ -7,7 +7,6 @@
 
 # Folders for compiled objects, libraries, and binaries, respectively 
 OBJ ?= obj
-LIB ?= lib
 BIN ?= bin
 
 # Default compiler to use (if not defined externally)
@@ -16,10 +15,8 @@ CC ?= gcc
 # Default compiler options (if not defined externally)
 CFLAGS ?= -g -Os -Wall
 
-
 # Specific Doxygen to use if not the default one
 #DOXYGEN ?= /opt/bin/doxygen
-
 
 # To make SuperNOVAS thread-safe, we use thread-local storage modifier
 # keywords. These were not standardized prior to C11. So while we automatically
@@ -32,6 +29,8 @@ CFLAGS ?= -g -Os -Wall
 #or
 #THREAD_LOCAL ?= __declspec( thread )
 
+# To build / install the C++ library (libsupernovas++)...
+#ENABLE_CPP=1
 
 # To compile library with an external or legacy `solarsystem()` / 
 # `solarsystem_hp()` implementation as the default planet provider, specify 
@@ -67,7 +66,9 @@ CFLAGS ?= -g -Os -Wall
 
 # cppcheck options for 'check' target. You can add additional options by
 # setting the CHECKEXTRA variable (e.g. in shell) prior to invoking 'make'.
-CHECKOPTS ?= --enable=performance,warning,portability,style --language=c \
+LANGUAGE ?= c
+
+CHECKOPTS ?= --enable=performance,warning,portability,style --language=$(LANGUAGE) \
             --error-exitcode=1 --std=c99
 
 
@@ -90,13 +91,6 @@ export SUPERNOVAS_BUILD
 
 # The version of the shared .so libraries
 SO_VERSION := 1
-
-# Folders in which sources and headers are located, respectively
-SRC := src
-INC := include
-
-# Add include directory
-CPPFLAGS += -I$(INC)
 
 # If the THREAD_LOCAL variable was defined externally, use that definition to 
 # specify the thread local keyword to use. 
@@ -161,7 +155,8 @@ else
 endif 
 
 ifeq ($(AUTO_DETECT_LIBS),1)
-  # Use ldconfig (if available) to detect CALCEPH / CSPICE shared libs automatically
+  # Use ldconfig (if available) to detect CALCEPH / CSPICE shared libs 
+  # automatically
   ifndef CALCEPH_SUPPORT
     ifneq ($(shell ldconfig -p | grep libcalceph), )
       CALCEPH_SUPPORT = 1
@@ -174,15 +169,13 @@ ifeq ($(AUTO_DETECT_LIBS),1)
   endif
 endif
 
-SOURCES = $(SRC)/target.c $(SRC)/observer.c $(SRC)/earth.c $(SRC)/equator.c $(SRC)/system.c \
-          $(SRC)/transform.c $(SRC)/cio.c $(SRC)/orbital.c $(SRC)/spectral.c $(SRC)/grav.c \
-          $(SRC)/nutation.c $(SRC)/timescale.c $(SRC)/frames.c $(SRC)/place.c $(SRC)/calendar.c  \
-          $(SRC)/refract.c $(SRC)/naif.c $(SRC)/parse.c $(SRC)/util.c $(SRC)/planets.c \
-          $(SRC)/itrf.c $(SRC)/ephemeris.c $(SRC)/solsys3.c $(SRC)/solsys-ephem.c
+SOURCES = target.c observer.c earth.c equator.c system.c transform.c cio.c \
+          orbital.c spectral.c grav.c nutation.c timescale.c frames.c place.c \
+          calendar.c refract.c naif.c parse.c util.c planets.c itrf.c \
+          ephemeris.c solsys3.c solsys-ephem.c moon.c
 
 # Generate a list of object (obj/*.o) files from the input sources
-OBJECTS := $(subst $(SRC),$(OBJ),$(SOURCES))
-OBJECTS := $(subst .c,.o,$(OBJECTS))
+OBJECTS := $(addprefix $(OBJ)/,$(subst .c,.o,$(SOURCES)))
 
 # Default values for install locations
 # See https://www.gnu.org/prep/standards/html_node/Directory-Variables.html 
@@ -197,8 +190,7 @@ docdir ?= $(datarootdir)/doc/supernovas
 htmldir ?= $(docdir)/html
 
 # Search for files in the designated locations
-vpath %.h $(INCLUDE)
-vpath %.c $(SRC)
+vpath %.h $(INC)
 vpath %.o $(OBJ)
 vpath %.d dep
 

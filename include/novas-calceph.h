@@ -10,16 +10,13 @@
 #ifndef NOVAS_CALCEPH_H_
 #define NOVAS_CALCEPH_H_
 
-#  include <calceph.h>
-#  include "novas.h"
+#include <calceph.h>
 
 #if __cplusplus
-#  ifdef NOVAS_NAMESPACE
-namespace novas {
-#  endif
-
 extern "C" {
 #endif
+
+#include "novas.h"
 
 /// @ingroup solar-system
 int novas_calceph_is_thread_safe();
@@ -35,10 +32,6 @@ int novas_calceph_use_ids(enum novas_id_type idtype);
 
 #if __cplusplus
 } // extern "C"
-
-#  ifdef NOVAS_NAMESPACE
-} // namespace novas
-#  endif
 #endif
 
 #endif /* NOVAS_CALCEPH_H_ */

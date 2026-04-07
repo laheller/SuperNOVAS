@@ -8,18 +8,55 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-Upcoming feature release.
+Upcoming feature release, introducing a proper C++ API for the first time, and bringing various other improvements.
 
 ### Fixed
 
+ - #293: `geo_posvel()` applied TOD to ICRS conversions twice for airborne observers, resulting in imprecise
+   observer coordinates relative to the geocenter.
+   
+ - #296: Possible buffer overflow in `novas_print_dms()`. (thanks to aleberti)
+ 
+ - #299: Fix memory leak in `Frame`. (thanks to aleberti)
+
+ - #305: `novas_geom_posvel()` returned velocities were referenced to SSB, not the observer.
 
 ### Added
+
+ - #256: New C++11 API to wrap the C99 functions into a higher-level, easier to use, and object-oriented interface.
+   (thanks to aleberti for helping with testing and debugging).
+
+ - #256: New `novas_time_leap()` to simplify back calculating the leap seconds from a `novas_timespec` structure.
+
+ - #281: Added a truncated version of semi-analytic ELP/MPP02 model of the Moon's position relative to the geocenter 
+   by Chapront &amp; Francou (2003), using up to about 3400 terms, and reaching accuracies to the 1 arcsec / 1km
+   level (or better for the present era). 
+   
+ - #298: Added `cspice_clear_kernels()` to CSPICE plugin to close all kernels and free up the resources they use 
+   (thanks to aleberti)
+   
+ - #306: Added `novas_site_gcrs_posvel()` as a more precise alternative to `geo_posvel()` for Earth-bound observers,
+   when polar wobble offsets are known.
 
  - Added `novas_enu_to_itrs()` and `novas_itrs_to_enu()` functions to help convert between local East-North-Up (ENU)
    coordinates and ITRS. ENU is a natural local cartesian coordinate system of an observer at or near the Earth's 
    surface.
 
+ - New `novas_diff_time_scale()` for obtaining time difference between two astrometric times in the specified 
+   timescale of choice.
+   
+ - New `novas_timescale_offset()` for returning the time offset in two different timescale representations of a time
+   instance
+
 ### Changed
+
+ - #256: Changes to repo layout to accommodate C++ API _in addition to_ the base C99 API.
+ 
+ - #306: `novas_make_frame()` now uses the new `novas_site_gcrs_posvel()` when calculating SSB-based observer location 
+   and velocity in the GCRS.
+   
+ - #306: `geo_posvel()` changed to return an error (-1) if used for a geodetic observer and debug mode is set to
+   `NOVAS_DEBUG_EXTRA`, to warn that polar offsets are not included in the calculation. 
 
  - Use more precise matrix from Liu et al. (2011) for equatorial / galactic conversions. 
 

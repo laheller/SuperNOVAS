@@ -7,7 +7,7 @@ Name: supernovas
 Description: @PROJECT_DESCRIPTION@
 Version: @PROJECT_VERSION@
 URL: @PROJECT_HOMEPAGE_URL@
-Copyright: (C) 2025 Attila Kovacs
+Copyright: (C) 2026 Attila Kovacs
 License: Unlicense
 
 Cflags: -I${includedir}

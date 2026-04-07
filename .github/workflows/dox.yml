@@ -12,6 +12,7 @@ on:
       - main
     paths:
       - 'doc/**'
+      - 'resources/**'
       - 'src/**'
       - 'include/**'
       - 'Makefile'
@@ -21,11 +22,13 @@ on:
   pull_request:
     paths:
       - 'doc/**'
+      - 'resources/**'
       - 'src/**'
       - 'include/**'
       - 'Makefile'
       - '*.md'
       - '.github/workflows/dox.yml'
+
 jobs:
 
   apidocs:
@@ -60,8 +63,16 @@ jobs:
 
     - uses: mattnotmitt/doxygen-action@edge
       with:
-        working-directory: 'doc/'
+        working-directory: 'doc/c99'
         additional-packages: font-roboto
+
+    - uses: mattnotmitt/doxygen-action@edge
+      with:
+        working-directory: 'doc/cpp'
+        additional-packages: font-roboto
+
+    - name: Insert Google analytics tracker
+      run: for file in doc/c*/html/*.html ; do sudo sed -i "/<\/head>/e cat resources/analytics.html" $file ; done
 
     - name: Checkout gh-pages
       uses: actions/checkout@v6
@@ -77,12 +88,21 @@ jobs:
         rm doc/README.md
         mv doc/README-undecorated.md doc/README.md
         cp doc/*.md site/doc/
+        cp doc/cpp/*.md site/doc/
+        cp doc/c99/*.md site/doc/
 
     - name: Copy CHANGELOG
       run: cp -a CHANGELOG.md site/doc/
 
+    - name: Copy Usage Guides
+      run: cp -a USAGE-*.md site/doc/
+
     - name: Copy API documentation
-      run: cp -a doc/html site/doc/
+      run: |
+        rm -rf site/doc/html
+        cp -a doc/c99/html site/doc/
+        mkdir site/doc/html/cpp
+        cp -a doc/cpp/html/* site/doc/html/cpp/
         
     - name: Assert site/resources/
       run: mkdir -p site/resources
@@ -97,7 +117,6 @@ jobs:
         git config --global user.name "github-actions"
         git add -A
         git commit -m "[automated site update]" && git push || true
-
 
   changelog-update:
     name: Update CHANGELOG on github pages

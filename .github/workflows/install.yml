@@ -32,11 +32,12 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cc: gcc
+            cc: g++
           - os: macos-latest
             cc: clang
     env:
       CC: ${{ matrix.cc }}
+      ENABLE_CPP: 1
     steps:
       - uses: actions/checkout@v6
 
@@ -54,4 +55,6 @@ jobs:
         run: make distro
 
       - name: Install to local prefix
-        run: make DESTDIR=$HOME/.local install
+        run: |
+          make DESTDIR=$HOME/test-install install
+
